@@ -1441,7 +1441,7 @@ Instrument with **OpenTelemetry**, collect and analyze in **Application Insights
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-20 -->
 
 ## Security Posture — Defender for Cloud and Sentinel
 
@@ -1503,7 +1503,7 @@ Use phased delivery, approval controls, provenance, incident response, and rollb
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-20 -->
 
 ## Key Takeaways
 
@@ -1559,7 +1559,7 @@ The rest of this presentation is one section per question.
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-20 -->
 
 ## Identity: Keys, Tokens, and Managed Identity
 
@@ -1600,7 +1600,7 @@ A key is something you _have_. An identity is something you _are_ — and Azure 
   With a key                     With managed identity
 
   app ━━━ key in config          app  ━━━(1) "who am I?"━━▶ Azure platform
-      \                              ◀━━(2) short-lived token ━━━
+      \                               ◀━━(2) short-lived token ━━━
        ┗━━▶ AI resource               ━━━(3) call with token ━▶ AI resource
                                                                      |
   key leaks = permanent problem                  (4) checks RBAC role
@@ -1661,7 +1661,7 @@ Capacity is not one number. Three separate limits can each stop you.
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-24 -->
 
 ## Capacity Dimensions and Levers
 
@@ -1702,18 +1702,12 @@ Pause here and complete [Lab 8](../lab/lab%208/lab.md) before continuing.
 
 **_[EXAM]_**
 
-**Treat AI configuration as deployable application state:**
+**Essential:** treat prompts, agent definitions, tool schemas, and evaluation datasets as versioned application assets.
 
-1. Store prompts, agent definitions, tool schemas, and evaluation datasets in source control
-2. Use separate development, test, and production projects or deployments
-3. Validate infrastructure, model availability, permissions, and safety settings in a pipeline
-4. Run quality and safety evaluations before promotion
-5. Deploy a versioned agent or model configuration
-6. Monitor the release and keep a rollback path
-
-**Keep environment-specific values outside source:** endpoints, keys, resource IDs, and deployment names belong in secure configuration.
-
-**MSLearn status:** Microsoft 365 Agents Toolkit material discusses CI/CD, but this end-to-end governance pattern is not a dedicated core lesson.
+- Use separate development, test, and production deployments
+- Run quality and safety evaluations before promotion
+- Keep endpoints, keys, resource IDs, and deployment names in secure environment configuration
+- Monitor releases and retain a rollback path
 
 ---
 
@@ -1725,7 +1719,7 @@ Pause here and complete [Lab 9](../lab/lab%209/lab.md), then check its solution.
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-24 -->
 
 ## Observability and Evaluation in Production
 
@@ -1805,7 +1799,7 @@ Relationship to the Microsoft Learn path
 
 ---
 
-<!-- _class: fit-24 -->
+<!-- _class: fit-20 -->
 
 ## Coverage Map
 
