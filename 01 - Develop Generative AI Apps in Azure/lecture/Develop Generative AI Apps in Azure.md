@@ -1316,7 +1316,7 @@ Pause here and complete [Lab 5](../lab/lab%205/lab.md), then check its [solution
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-16 -->
 
 ## Model Lifecycle and Retirement
 
@@ -1349,7 +1349,7 @@ Pause here and complete [Lab 5](../lab/lab%205/lab.md), then check its [solution
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-20 -->
 
 ## Monitor Your AI Application
 
