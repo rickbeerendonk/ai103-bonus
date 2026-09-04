@@ -1,10 +1,6 @@
 # Labs - Develop generative AI solutions in Azure
 
-6 exercises (4 hours 25 minutes):
-
-https://microsoftlearning.github.io/mslearn-ai-studio/
-
----
+6 exercises (3 hours 40 minutes)
 
 https://microsoftlearning.github.io/mslearn-ai-studio/Instructions/Exercises/01-Explore-ai-studio.html
 30 minutes
@@ -17,10 +13,6 @@ https://microsoftlearning.github.io/mslearn-ai-studio/Instructions/Exercises/03-
 
 https://microsoftlearning.github.io/mslearn-ai-studio/Instructions/Exercises/04a-use-own-data.html
 30 minutes
-
-**SKIPPED in slides**
-https://microsoftlearning.github.io/mslearn-ai-studio/Instructions/Exercises/04b-finetune-model.html
-90 minutes
 
 https://microsoftlearning.github.io/mslearn-ai-studio/Instructions/Exercises/06-Explore-content-filters.html
 25 minutes
