@@ -957,6 +957,14 @@ Regenerating the key the app is currently using breaks it immediately.
 
 <!-- _class: lead -->
 
+## Retrieval Practice — Lab 10
+
+Pause here and complete [Lab 10](../lab/lab%2010/lab.md), then check its solution.
+
+---
+
+<!-- _class: lead -->
+
 # Multimodal and Extraction Exam Gaps
 
 Extend visual and extraction workflows with accessibility, safety, evidence, and cross-topic controls.
@@ -1035,6 +1043,14 @@ response = client.analyze_image(request)   # severity per harm category
 | Blocklists           | Configured phrases, reactive and text-only          |
 
 **Two different image risks:** moderation stops a harmful _picture_; prompt shields stop _hidden instructions_ inside it. A solution that accepts uploads usually needs both.
+
+---
+
+<!-- _class: fit-28 -->
+
+## Retrieval Practice — Lab 6
+
+Pause here and complete [Lab 6](../lab/lab%206/lab.md), then check its solution.
 
 ---
 
@@ -1143,12 +1159,6 @@ Classifying manufactured components as faulty or acceptable:
 | **Recall 100%**       | Every actual instance was found                  |
 
 **Trap:** `TP / (TP + FP)` computes **precision**, so it is not the answer when the question asks for recall.
-
----
-
-## Retrieval Practice — Lab 6
-
-Pause here and complete [Lab 6](../lab/lab%206/lab.md) before continuing.
 
 ---
 
@@ -1329,12 +1339,6 @@ Pause here and complete [Lab 9](../lab/lab%209/lab.md) before continuing.
 
 ---
 
-## Retrieval Practice — Lab 10
-
-Pause here and complete [Lab 10](../lab/lab%2010/lab.md), then check its solution.
-
----
-
 <!-- _class: lead -->
 
 # Appendix
@@ -1359,39 +1363,3 @@ Relationship to the Microsoft Learn path
 | Document translation                            | **Partial** — text, speech translation, and transliteration are covered; document translation is not developed deeply |
 
 **Interpretation:** this topic adds exam vocabulary and decision patterns around areas that the official lessons either mention briefly or treat through a different service.
-
----
-
-<!-- _class: fit-28 -->
-
-## Retrieval Practice — Topic 7
-
-Pause after each matching section and answer the checkpoint questions before continuing:
-
-- **Content Safety:** Questions 1–3
-- **Multimodal input:** Questions 4–6
-- **Document extraction:** Questions 7–9
-- **Speech and workflow:** Questions 10–12
-- **Search and privacy:** Questions 13–15
-
-[Open Topic 7, Lab 6](../lab/lab%206/lab.md) · [Open the Lab 6 solution](../lab/lab%206/solution.md)
-
----
-
-## Retrieval Practice — Topic 4
-
-Pause after each matching section and answer the checkpoint questions before continuing:
-
-- **Vision:** Questions 1–3
-- **Generation:** Questions 4–6
-- **Document Intelligence:** Questions 7–9
-- **Content Understanding:** Questions 10–12
-- **Safety and accessibility:** Questions 13–15
-
-[Open Topic 4, Lab 1](../lab/lab%201/lab.md) · [Open the Lab 1 solution](../lab/lab%201/solution.md)
-
----
-
-## Official Microsoft Slides
-
-[Open the official Topic 4 slides in original order](official/official-slides.md)

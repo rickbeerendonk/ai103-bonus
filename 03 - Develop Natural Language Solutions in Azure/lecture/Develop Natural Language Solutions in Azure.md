@@ -882,31 +882,3 @@ Analyzing confidential **on-premises** documents:
 8. **Live vs recorded** — real-time speech-to-text for live audio, batch transcription only for completed recordings
 9. **Custom NER** — fix low precision by narrowing the entity definition, not by lowering the threshold
 10. **Immersive Reader** — the reading-accessibility service; **private endpoint + VPN/ExpressRoute** — the network-isolation pattern
-
----
-
-## Retrieval Practice — Lab 5
-
-Pause here and complete [Lab 5](../lab/lab%205/lab.md), then check its solution.
-
----
-
-<!-- _class: fit-28 -->
-
-## Retrieval Practice — Topic 3
-
-Pause after each matching section and answer the checkpoint questions before continuing:
-
-- **Language analysis:** Questions 1–3
-- **Safety and privacy:** Questions 4–6
-- **Speech:** Questions 7–9
-- **Translation and pronunciation:** Questions 10–12
-- **Responsible AI:** Questions 13–15
-
-[Open Topic 3, Lab 1](../lab/lab%201/lab.md) · [Open the Lab 1 solution](../lab/lab%201/solution.md)
-
----
-
-## Official Microsoft Slides
-
-[Open the official Topic 3 slides in original order](official/official-slides.md)

@@ -1390,6 +1390,14 @@ AzureMetrics | take 100
 
 <!-- _class: fit-24 -->
 
+## Retrieval Practice — Lab 6
+
+Pause here and complete [Lab 6](../lab/lab%206/lab.md), then check its solution.
+
+---
+
+<!-- _class: fit-24 -->
+
 ## Which Signal Answers Which Question
 
 **_[EXAM]_**
@@ -1607,14 +1615,6 @@ A key is something you _have_. An identity is something you _are_ — and Azure 
 
 <!-- _class: fit-28 -->
 
-## Retrieval Practice — Lab 6
-
-Pause here and complete [Lab 6](../lab/lab%206/lab.md) before continuing.
-
----
-
-<!-- _class: fit-28 -->
-
 ## Private Networking and Data Protection
 
 **_[EXAM]_**
@@ -1825,43 +1825,3 @@ This topic supplements the four core presentations. It does not replace the offi
 | CI/CD for Foundry projects                        | **Indirect** — discussed in Microsoft 365 Toolkit material                   |
 | Monitoring, tracing, drift, and grounding quality | **Indirect** — evaluation and tracing are introduced, operations are lighter |
 | Audit, provenance, approval, and oversight        | **Indirect** — responsible AI and workflow approval are covered separately   |
-
----
-
-<!-- _class: fit-28 -->
-
-## Retrieval Practice — Topic 5
-
-Pause after each matching section and answer the checkpoint questions before continuing:
-
-- **Observability:** Questions 1–3
-- **Security:** Questions 4–6
-- **Reliability:** Questions 7–9
-- **Governance:** Questions 10–12
-- **Access control:** Questions 13–15
-
-[Open Topic 5, Lab 6](../lab/lab%206/lab.md) · [Open the Lab 6 solution](../lab/lab%206/solution.md)
-
----
-
-<!-- _class: fit-28 -->
-
-## Retrieval Practice — Topic 1
-
-Pause after each matching section and answer the checkpoint questions before continuing:
-
-- **Foundry and models:** Questions 1–3
-- **Requests and state:** Questions 4–6
-- **Tools and grounding:** Questions 7–9
-- **Output behavior:** Questions 10–12
-- **Safety and operations:** Questions 13–15
-
-[Open Topic 1, Lab 1](../lab/lab%201/lab.md) · [Open the Lab 1 solution](../lab/lab%201/solution.md)
-
----
-
-<!-- _class: fit-28 -->
-
-## Official Microsoft Slides
-
-[Open the official Topic 1 slides in original order](official/official-slides.md)

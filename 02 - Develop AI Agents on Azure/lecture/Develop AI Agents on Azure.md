@@ -1189,6 +1189,14 @@ This presentation is that vocabulary.
 
 <!-- _class: fit-28 -->
 
+## Retrieval Practice — Lab 6
+
+Pause here and complete [Lab 6](../lab/lab%206/lab.md), then check its solution.
+
+---
+
+<!-- _class: fit-28 -->
+
 ## Classic Agent Service Lifecycle
 
 **_[EXAM]_**
@@ -1241,9 +1249,9 @@ create agent
 
 ---
 
-## Retrieval Practice — Lab 6
+## Retrieval Practice — Lab 7
 
-Pause here and complete [Lab 6](../lab/lab%206/lab.md) before continuing.
+Pause here and complete [Lab 7](../lab/lab%207/lab.md), then check its solution.
 
 ---
 
@@ -1261,12 +1269,6 @@ Pause here and complete [Lab 6](../lab/lab%206/lab.md) before continuing.
 | **Azure Function/OpenAPI** | Connect APIs and event-driven logic            | Authentication and API contract             |
 
 **Selection rule:** use the narrowest tool that solves the task, and require approval for actions with external side effects.
-
----
-
-## Retrieval Practice — Lab 7
-
-Pause here and complete [Lab 7](../lab/lab%207/lab.md), then check its solution.
 
 ---
 
@@ -1439,39 +1441,3 @@ Relationship to the Microsoft Learn path
 | Prompt parameters and generation controls                              | **Partial** — temperature, top P, and token limits are covered; frequency and presence penalties are not    |
 | Reflection, self-critique, and error analysis                          | **Indirect** — evaluation is covered; these patterns are not developed deeply                               |
 | Agent production monitoring                                            | **Indirect** — tracing and feedback appear, but the exam checklist is broader                               |
-
----
-
-<!-- _class: fit-28 -->
-
-## Retrieval Practice — Topic 6
-
-Pause after each matching section and answer the checkpoint questions before continuing:
-
-- **Retrieval quality:** Questions 1–3
-- **History and memory:** Questions 4–6
-- **Search and tools:** Questions 7–9
-- **Model operations:** Questions 10–12
-- **Agent control:** Questions 13–15
-
-[Open Topic 6, Lab 6](../lab/lab%206/lab.md) · [Open the Lab 6 solution](../lab/lab%206/solution.md)
-
----
-
-## Retrieval Practice — Topic 2
-
-Pause after each matching section and answer the checkpoint questions before continuing:
-
-- **Agent foundations:** Questions 1–3
-- **Tools:** Questions 4–6
-- **Foundry agents:** Questions 7–9
-- **Knowledge:** Questions 10–12
-- **Orchestration:** Questions 13–15
-
-[Open Topic 2, Lab 1](../lab/lab%201/lab.md) · [Open the Lab 1 solution](../lab/lab%201/solution.md)
-
----
-
-## Official Microsoft Slides
-
-[Open the official Topic 2 slides in original order](official/official-slides.md)
