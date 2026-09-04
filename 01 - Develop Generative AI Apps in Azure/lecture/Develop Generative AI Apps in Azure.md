@@ -633,7 +633,7 @@ Pause here and complete [Lab 2](../lab/lab%202/lab.md), then check its [solution
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-20 -->
 
 ## Persisting Conversation History
 
