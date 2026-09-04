@@ -70,6 +70,14 @@ The loop is the part people forget. It is the whole trick.
 
 ---
 
+<!-- _class: fit-28 -->
+
+## Retrieval Practice — Lab 1
+
+Pause here and complete [Lab 1](../lab/lab%201/lab.md) before continuing.
+
+---
+
 <!-- _class: lead -->
 
 # Agent Service
@@ -179,14 +187,6 @@ agent = project_client.agents.get(name="my-agent")   # retrieve an existing agen
 
 ---
 
-<!-- _class: fit-28 -->
-
-## Retrieval Practice — Lab 1
-
-Pause here and complete [Lab 1](../lab/lab%201/lab.md) before continuing.
-
----
-
 ## Custom Tool Options
 
 **_[EXAM]_**
@@ -197,12 +197,6 @@ Pause here and complete [Lab 1](../lab/lab%201/lab.md) before continuing.
 | **Azure Functions**                    | Event-driven via queue triggers; input/output bindings |
 | **OpenAPI specification**              | Connect to any HTTP API via OpenAPI 3.0 spec           |
 | **Azure Logic Apps**                   | Low-code/no-code workflow integration                  |
-
----
-
-## Retrieval Practice — Lab 2
-
-Pause here and complete [Lab 2](../lab/lab%202/lab.md), then check its solution.
 
 ---
 
@@ -433,19 +427,15 @@ if response_item.type == "mcp_approval_request":
 
 ---
 
+## Retrieval Practice — Lab 2
+
+Pause here and complete [Lab 2](../lab/lab%202/lab.md), then check its solution.
+
+---
+
 <!-- _class: lead -->
 
 # Foundry IQ — Knowledge
-
----
-
-<!-- _class: fit-28 -->
-
-## Retrieval Practice — Lab 3
-
-Pause here and complete [Lab 3](../lab/lab%203/lab.md) before continuing.
-
----
 
 <!-- _class: fit-24 -->
 
@@ -690,16 +680,6 @@ Pause here and complete [Lab 4](../lab/lab%204/lab.md), then check its solution.
 
 # Agent Workflows
 
----
-
-<!-- _class: fit-28 -->
-
-## Retrieval Practice — Lab 5
-
-Pause here and complete [Lab 5](../lab/lab%205/lab.md), then check its solution.
-
----
-
 ## Workflow Patterns
 
 **_[EXAM]_**
@@ -738,6 +718,14 @@ For a workflow that must pause before an external side effect, use an **`ask_que
 | Independent steps that can run at the same time                                   | Concurrent                                       |
 
 **Why not the alternatives:** a multi-agent group chat is built for autonomous conversational collaboration and lets the agents choose the order; concurrent orchestration runs steps in parallel; threads and runs without a workflow — or separate agent runs coordinated in your own application code — mean you write and maintain the orchestration yourself.
+
+---
+
+<!-- _class: fit-28 -->
+
+## Retrieval Practice — Lab 5
+
+Pause here and complete [Lab 5](../lab/lab%205/lab.md), then check its solution.
 
 ---
 
@@ -1413,6 +1401,14 @@ Use a labeled evaluation dataset, reproduce the failure, change one layer, and c
 **_[EXAM]_**
 
 When a tool call requires approval, the SDK submits a Boolean decision such as `approve=True` or `approve=False` tied to the tool call. The string `"approved"` is not the SDK approval value.
+
+---
+
+<!-- _class: fit-28 -->
+
+## Retrieval Practice — Lab 3
+
+Pause here and complete [Lab 3](../lab/lab%203/lab.md) before continuing.
 
 ---
 
