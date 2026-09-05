@@ -872,7 +872,7 @@ Analyzing confidential **on-premises** documents:
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-24 -->
 
 ## Key Takeaways
 
