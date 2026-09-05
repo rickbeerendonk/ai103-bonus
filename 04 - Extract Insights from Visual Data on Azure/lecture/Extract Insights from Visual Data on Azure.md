@@ -74,13 +74,13 @@ Image analysis, video generation, and document analysis all take longer than one
 
 ```text
   1  you submit the job        begin_analyze(...) / videos.create(...)
-          ┃
-          ▼                     you get back an operation id, not a result
+         ┃
+         ▼                     you get back an operation id, not a result
   2  service works in the background
-          ┃
+         ┃
   3  you poll                  "is it done yet?"   status: running
-         |                     "is it done yet?"   status: running
-         |                     "is it done yet?"   status: succeeded
+         ┃                     "is it done yet?"   status: running
+         ┃                     "is it done yet?"   status: succeeded
          ▼
   4  you fetch the result      poller.result()  /  download the file
 ```
@@ -141,7 +141,7 @@ print(response.output_text)
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-24 -->
 
 ## ChatCompletions API (gpt-4.1, Phi-4)
 
@@ -173,15 +173,15 @@ print(response.choices[0].message.content)
 
 ---
 
-<!-- _class: lead -->
-
-# Image Generation
-
----
-
 ## Retrieval Practice — Lab 1
 
 Pause here and complete [Lab 1](../lab/lab%201/lab.md) before continuing.
+
+---
+
+<!-- _class: lead -->
+
+# Image Generation
 
 ---
 
@@ -218,7 +218,7 @@ with open("output.png", "wb") as f:
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-24 -->
 
 ## Keeping a Real Product Recognisable
 
@@ -244,7 +244,7 @@ result = client.images.edit(
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-20 -->
 
 ## Detecting Brands and Reading Bounding Boxes
 
@@ -264,8 +264,8 @@ foreach (var brand in analysis.Brands)
 
 ```text
   (X, Y) ●━━━━━━━━━━━━━━━┓
-      ┃               ┃  H
-      ┃               ┃
+         ┃               ┃  H
+         ┃               ┃
          ┗━━━━━━━━━━━━━━━┛
              W        ● (X + W, Y + H)  ◀━ bottom-right, calculated
 ```
@@ -279,7 +279,7 @@ foreach (var brand in analysis.Brands)
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-24 -->
 
 ## Image Editing — Inpainting with a Mask
 
@@ -318,7 +318,7 @@ Pause here and complete [Lab 2](../lab/lab%202/lab.md), then check its solution.
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-20 -->
 
 ## Sora Video Generation
 
@@ -353,7 +353,7 @@ content.write_to_file("output.mp4")
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-24 -->
 
 ## Sora — Remix and Reference Image
 
@@ -382,7 +382,7 @@ video = client.videos.create(
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-24 -->
 
 ## Editing Video Without Regenerating It
 
@@ -407,7 +407,7 @@ A finished clip contains an unwanted watermark or object. Regenerating produces 
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-20 -->
 
 ## ContentUnderstandingClient
 
@@ -441,6 +441,8 @@ print(result.contents[0].fields)            # extracted fields dict
 ```
 
 ---
+
+<!-- _class: fit-20 -->
 
 ## Prebuilt Analyzers
 
@@ -495,7 +497,7 @@ print(result.contents[0].fields)            # extracted fields dict
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-20 -->
 
 ## Field Schema and Confidence Thresholds
 
@@ -525,7 +527,7 @@ For scanned troubleshooting documents, enable `estimateFieldSourceAndConfidence`
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-20 -->
 
 ## Custom Analyzers
 
@@ -558,7 +560,7 @@ Poll result via `Operation-Location` response header
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-24 -->
 
 ## Content Understanding: Build vs. Consume
 
@@ -581,7 +583,7 @@ Poll result via `Operation-Location` response header
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-24 -->
 
 ## Content Understanding Client Workflow
 
@@ -646,7 +648,7 @@ Reach for an analyzer when the requirement combines **structure**, **more than o
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-24 -->
 
 ## Document Intelligence Models
 
@@ -680,7 +682,7 @@ Pause here and complete [Lab 3](../lab/lab%203/lab.md), then check its solution.
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-24 -->
 
 ## DocumentAnalysisClient
 
@@ -710,7 +712,7 @@ for doc in result.documents:
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-20 -->
 
 ## Layout Model: Markdown Output and Page Chunks
 
@@ -773,7 +775,7 @@ Pause here and complete [Lab 4](../lab/lab%204/lab.md), then check its solution.
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-24 -->
 
 ## Two Timelines, Not One
 
@@ -797,7 +799,7 @@ The most common confusion with AI Search: enrichment does **not** happen when a 
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-24 -->
 
 ## Enrichment Pipeline
 
@@ -830,7 +832,7 @@ For embedded PDF images that must be OCR-ready while retaining source citations,
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-24 -->
 
 ## Built-in AI Skills (Foundry Tools)
 
@@ -867,7 +869,7 @@ Entity extraction, language detection, and key phrase extraction enrich text but
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-24 -->
 
 ## Build a Knowledge Mining Solution
 
@@ -886,7 +888,7 @@ Entity extraction, language detection, and key phrase extraction enrich text but
 
 ---
 
-<!-- _class: fit-24 -->
+<!-- _class: fit-20 -->
 
 ## Choosing a Retrieval Mode
 
@@ -925,7 +927,7 @@ Entity extraction, language detection, and key phrase extraction enrich text but
 
 ---
 
-<!-- _class: fit-24 -->
+<!-- _class: fit-20 -->
 
 ## Search Security Operations
 
@@ -971,7 +973,7 @@ Extend visual and extraction workflows with accessibility, safety, evidence, and
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-24 -->
 
 ## Visual Evidence and Accessibility
 
@@ -984,7 +986,7 @@ Use a multimodal model for prose, and an extraction or detection workflow when a
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-24 -->
 
 ## Extraction and Search Operations
 
@@ -1019,7 +1021,7 @@ Pause here and complete [Lab 5](../lab/lab%205/lab.md), then check its solution.
 
 ---
 
-<!-- _class: fit-24 -->
+<!-- _class: fit-20 -->
 
 ## Moderating Uploaded Images
 
@@ -1046,7 +1048,7 @@ response = client.analyze_image(request)   # severity per harm category
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-24 -->
 
 ## Retrieval Practice — Lab 6
 
@@ -1054,7 +1056,7 @@ Pause here and complete [Lab 6](../lab/lab%206/lab.md), then check its solution.
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-24 -->
 
 ## Problem: Everyone Says "Analyse the Image"
 
@@ -1075,7 +1077,7 @@ Picking a service before naming the output is the most common mistake in this ar
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-24 -->
 
 ## Prose or Evidence?
 
@@ -1097,7 +1099,7 @@ The deepest split in this topic is not "which product", it is **what the answer 
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-24 -->
 
 ## Visual Understanding Patterns
 
@@ -1123,7 +1125,7 @@ The deepest split in this topic is not "which product", it is **what the answer 
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-24 -->
 
 ## Custom Vision — Train a Classifier
 
@@ -1142,7 +1144,7 @@ Classifying manufactured components as faulty or acceptable:
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-24 -->
 
 ## Precision and Recall
 
@@ -1191,7 +1193,7 @@ Alt-text: Three people review a dashboard beside a wall display showing monthly 
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-24 -->
 
 ## Video and Region-Level Analysis
 
@@ -1243,7 +1245,7 @@ Pause here and complete [Lab 7](../lab/lab%207/lab.md), then check its solution.
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-24 -->
 
 ## Document Intelligence vs. Content Understanding
 
@@ -1347,7 +1349,7 @@ Relationship to the Microsoft Learn path
 
 ---
 
-<!-- _class: fit-24 -->
+<!-- _class: fit-20 -->
 
 ## Coverage Map
 
