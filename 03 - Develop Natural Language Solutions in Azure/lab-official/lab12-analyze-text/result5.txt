@@ -1,0 +1,33 @@
+review5.txt
+
+Un hôtel agréable
+L'Hotel Buckingham, Londres, UK
+J’adore cet hôtel. Le personnel est très amical et les chambres sont confortables.
+
+Language: French
+
+Sentiment: positive
+
+Key Phrases:
+        hôtel agréable
+        L'Hotel Buckingham
+        Londres
+        UK
+        personnel
+        chambres
+
+Entities
+        hôtel (Location)
+        Buckingham (Organization)
+        Londres (Location)
+        UK (Location)
+        hôtel (Location)
+        personnel (PersonType)
+        chambres (Location)
+
+Links
+        United Nations (https://en.wikipedia.org/wiki/United_Nations)
+        L'Hôtel (https://en.wikipedia.org/wiki/L'Hôtel)
+        Buckingham (https://en.wikipedia.org/wiki/Buckingham)
+        London (https://en.wikipedia.org/wiki/London)
+        United Kingdom (https://en.wikipedia.org/wiki/United_Kingdom)

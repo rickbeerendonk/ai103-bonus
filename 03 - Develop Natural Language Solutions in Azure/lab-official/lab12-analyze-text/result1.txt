@@ -1,0 +1,66 @@
+review1.txt
+
+Good Hotel and staff
+The Royal Hotel, London, UK
+3/2/2018
+Clean rooms, good service, great location near Buckingham Palace and Westminster Abbey, and so on. We thoroughly enjoyed our stay. The courtyard is very peaceful and we went to a restaurant which is part of the same group and is Indian ( West coast so plenty of fish) with a Michelin Star. We had the taster menu which was fabulous. The rooms were very well appointed with a kitchen, lounge, bedroom and enormous bathroom. Thoroughly recommended.
+
+Language: English
+
+Sentiment: positive
+
+Key Phrases:
+        The Royal Hotel
+        Good Hotel
+        good service
+        great location
+        Buckingham Palace
+        Westminster Abbey
+        same group
+        West coast
+        Michelin Star
+        taster menu
+        enormous bathroom
+        Clean rooms
+        staff
+        London
+        UK
+        stay
+        courtyard
+        restaurant
+        part
+        plenty
+        fish
+        kitchen
+        lounge
+        bedroom
+
+Entities
+        Hotel (Location)
+        staff (PersonType)
+        Royal Hotel, London, UK (Address)
+        3/2/2018 (DateTime)
+        Buckingham Palace (Location)
+        Westminster Abbey (Location)
+        courtyard (Location)
+        restaurant (Location)
+        Indian (PersonType)
+        West coast (Location)
+        fish (Product)
+        taster (Product)
+        rooms (Location)
+        kitchen (Location)
+        lounge (Location)
+        bedroom (Location)
+        bathroom (Location)
+
+Links
+        GOOD Music (https://en.wikipedia.org/wiki/GOOD_Music)
+        Hotel (https://en.wikipedia.org/wiki/Hotel)
+        The Royal Hotel (https://en.wikipedia.org/wiki/The_Royal_Hotel)
+        London (https://en.wikipedia.org/wiki/London)
+        Buckingham Palace (https://en.wikipedia.org/wiki/Buckingham_Palace)
+        Westminster Abbey (https://en.wikipedia.org/wiki/Westminster_Abbey)
+        India (https://en.wikipedia.org/wiki/India)
+        West Coast Main Line (https://en.wikipedia.org/wiki/West_Coast_Main_Line)
+        Michelin Guide (https://en.wikipedia.org/wiki/Michelin_Guide)

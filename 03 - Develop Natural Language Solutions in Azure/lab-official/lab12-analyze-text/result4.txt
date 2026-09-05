@@ -1,0 +1,86 @@
+review4.txt
+
+Very noisy and rooms are tiny
+The Lombard Hotel, San Francisco, USA
+9/5/2018
+Hotel is located on Lombard street which is a very busy SIX lane street directly off the Golden Gate Bridge. Traffic from early morning until late at night especially on weekends. Noise would not be so bad if rooms were better insulated but they are not. Had to put cotton balls in my ears to be able to sleep--was too tired to enjoy the city the next day. Rooms are TINY. I picked the room because it had two queen size beds--but the room barely had space to fit them. With family of four in the room it was tight. With all that said, rooms are clean and they've made an effort to update them. The hotel is in Marina district with lots of good places to eat, within walking distance to Presidio. May be good hotel for young stay-up-late adults on a budget
+
+
+Language: English
+
+Sentiment: mixed
+
+Key Phrases:
+        two queen size beds
+        busy SIX lane street
+        Golden Gate Bridge
+        The Lombard Hotel
+        Lombard street
+        San Francisco
+        early morning
+        cotton balls
+        Marina district
+        good places
+        walking distance
+        late adults
+        good hotel
+        rooms
+        USA
+        Traffic
+        night
+        weekends
+        Noise
+        ears
+        city
+        TINY
+        space
+        family
+        effort
+        lots
+        Presidio
+        young
+        budget
+
+Entities
+        rooms (Location)
+        Hotel (Location)
+        San Francisco (Location)
+        USA (Location)
+        9/5/2018 (DateTime)
+        Hotel (Location)
+        Lombard street (Address)
+        SIX (Quantity)
+        Golden Gate Bridge (Location)
+        early morning until late at night (DateTime)
+        weekends (DateTime)
+        rooms (Location)
+        cotton balls (Product)
+        city (Location)
+        the next day (DateTime)
+        Rooms (Location)
+        room (Location)
+        two (Quantity)
+        beds (Product)
+        room (Location)
+        four (Quantity)
+        room (Location)
+        rooms (Location)
+        hotel (Location)
+        Marina district (Location)
+        Presidio (Location)
+        hotel (Location)
+        young (PersonType)
+        adults (PersonType)
+
+Links
+        Lombard, Illinois (https://en.wikipedia.org/wiki/Lombard,_Illinois)
+        Hotel (https://en.wikipedia.org/wiki/Hotel)
+        San Francisco (https://en.wikipedia.org/wiki/San_Francisco)
+        Lombard Street (San Francisco) (https://en.wikipedia.org/wiki/Lombard_Street_(San_Francisco))
+        Golden Gate Bridge (https://en.wikipedia.org/wiki/Golden_Gate_Bridge)
+        Traffic (https://en.wikipedia.org/wiki/Traffic)
+        Noise rock (https://en.wikipedia.org/wiki/Noise_rock)
+        Room (https://en.wikipedia.org/wiki/Room)
+        Marina District, San Francisco (https://en.wikipedia.org/wiki/Marina_District,_San_Francisco)
+        Presidio of San Francisco (https://en.wikipedia.org/wiki/Presidio_of_San_Francisco)
+        May (https://en.wikipedia.org/wiki/May)

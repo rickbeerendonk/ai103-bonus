@@ -1,0 +1,48 @@
+review2.txt
+
+Tired hotel with poor service
+The Royal Hotel, London, United Kingdom
+5/6/2018
+This is a old hotel (has been around since 1950's) and the room furnishings are average - becoming a bit old now and require changing. The internet didn't work and had to come to one of their office rooms to check in for my flight home. The website says it's close to the British Museum, but it's too far to walk.
+
+Language: English
+
+Sentiment: negative
+
+Key Phrases:
+        The Royal Hotel
+        Tired hotel
+        old hotel
+        poor service
+        United Kingdom
+        room furnishings
+        office rooms
+        flight home
+        British Museum
+        London
+        changing
+        internet
+        website
+        1950
+
+Entities
+        hotel (Location)
+        The Royal Hotel (Organization)
+        London (Location)
+        United Kingdom (Location)
+        5/6/2018 (DateTime)
+        hotel (Location)
+        since 1950's (DateTime)
+        furnishings (Product)
+        now (DateTime)
+        internet (Skill)
+        one (Quantity)
+        office rooms (Location)
+        flight (Event)
+        home (Location)
+        British Museum (Location)
+
+Links
+        The Royal Hotel (https://en.wikipedia.org/wiki/The_Royal_Hotel)
+        London (https://en.wikipedia.org/wiki/London)
+        British Museum (https://en.wikipedia.org/wiki/British_Museum)

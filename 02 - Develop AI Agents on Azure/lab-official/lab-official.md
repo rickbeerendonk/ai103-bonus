@@ -1,14 +1,15 @@
 # Labs - Develop AI Agents in Azure
 
-6 exercises (4 hours 5 minutes)
+5 exercises (3 hours 35 minutes)
+1 demo (30 minutes)
 
-https://microsoftlearning.github.io/mslearn-ai-agents/Instructions/Exercises/02-agent-custom-tools.html
+Lab 07: https://microsoftlearning.github.io/mslearn-ai-agents/Instructions/Exercises/02-agent-custom-tools.html
 50 minutes
 
-https://microsoftlearning.github.io/mslearn-ai-agents/Instructions/Exercises/03-mcp-integration.html
+Lab 08: https://microsoftlearning.github.io/mslearn-ai-agents/Instructions/Exercises/03-mcp-integration.html
 60 minutes
 
-https://microsoftlearning.github.io/mslearn-ai-agents/Instructions/Exercises/04-integrate-agent-with-foundry-iq.html
+Lab 09: https://microsoftlearning.github.io/mslearn-ai-agents/Instructions/Exercises/04-integrate-agent-with-foundry-iq.html
 45 minutes
 
 **DEMO (skip)**
@@ -20,8 +21,8 @@ https://youtu.be/eWYOZkFoNn4?si=2KqGQfRd8w1tWpdN&t=361
 https://microsoftlearning.github.io/mslearn-ai-agents/Instructions/Exercises/06-build-workflow-ms-foundry.html
 30 minutes
 
-https://microsoftlearning.github.io/mslearn-ai-agents/Instructions/Exercises/07-agent-framework.html
+Lab 10: https://microsoftlearning.github.io/mslearn-ai-agents/Instructions/Exercises/07-agent-framework.html
 30 minutes
 
-https://microsoftlearning.github.io/mslearn-ai-agents/Instructions/Exercises/08-agent-framework-multi-agents.html
+Lab 11: https://microsoftlearning.github.io/mslearn-ai-agents/Instructions/Exercises/08-agent-framework-multi-agents.html
 30 minutes
