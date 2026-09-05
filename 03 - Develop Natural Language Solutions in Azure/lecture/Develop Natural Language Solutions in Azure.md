@@ -326,7 +326,7 @@ Pause here and complete [Lab 2](../lab/lab%202/lab.md), then check its solution.
 
 ---
 
-<!-- _class: fit-24 -->
+<!-- _class: fit-20 -->
 
 ## Language MCP Endpoint and Tools
 
