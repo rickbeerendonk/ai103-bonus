@@ -173,6 +173,8 @@ for doc in result:
 
 ---
 
+<!-- _class: fit-28 -->
+
 ## Entity Recognition and Linking
 
 **_[EXAM]_**
@@ -231,7 +233,7 @@ Pause here and complete [Lab 1](../lab/lab%201/lab.md) before continuing.
 
 ---
 
-<!-- _class: fit-24 -->
+<!-- _class: fit-16 -->
 
 ## Personally Identifiable Information (PII)
 
@@ -271,7 +273,7 @@ Output: Contact [PERSON] at [EMAIL] or [PHONENUMBER].
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-20 -->
 
 ## Content Safety — Text Analysis
 
@@ -324,7 +326,7 @@ Pause here and complete [Lab 2](../lab/lab%202/lab.md), then check its solution.
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-24 -->
 
 ## Language MCP Endpoint and Tools
 
@@ -513,7 +515,7 @@ speech_config.speech_synthesis_voice_name = 'en-US-Brian:DragonHDLatestNeural'
 
 ---
 
-<!-- _class: fit-24 -->
+<!-- _class: fit-20 -->
 
 ## Custom Speech
 
@@ -542,7 +544,7 @@ The REST request identifies the model by the **Custom Speech project ID** — no
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-20 -->
 
 ## SSML
 
@@ -649,7 +651,7 @@ Record → transcribe → think → speak takes several seconds. In a conversati
     wait                            ▼
   play audio                    audio streams back, chunk by chunk
 
-  ~3-6 seconds                  &lt; 1 second, and interruptible
+  ~3-6 seconds                  < 1 second, and interruptible
 ```
 
 **Interruption is the hard part.** When `input_audio_buffer.speech_started` arrives, the user began talking over the answer — stop playback immediately.
@@ -658,7 +660,7 @@ Record → transcribe → think → speak takes several seconds. In a conversati
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-20 -->
 
 ## Voice Live — Real-Time Speech
 
@@ -752,7 +754,7 @@ Pause here and complete [Lab 3](../lab/lab%203/lab.md), then check its solution.
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-20 -->
 
 ## Azure Translator — Text Translation
 
@@ -787,7 +789,7 @@ for doc in result:
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-24 -->
 
 ## Transliteration and Speech Translation
 
@@ -869,6 +871,8 @@ Analyzing confidential **on-premises** documents:
 **Identity answers “who”; networking answers “from where.”**
 
 ---
+
+<!-- _class: fit-28 -->
 
 ## Key Takeaways
 
