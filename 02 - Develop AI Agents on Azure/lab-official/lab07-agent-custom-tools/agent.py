@@ -4,7 +4,6 @@ from dotenv import load_dotenv
 
 # Add references
 from azure.ai.projects import AIProjectClient
-from azure.ai.projects.models import FunctionTool
 from azure.identity import DefaultAzureCredential
 from azure.ai.projects.models import PromptAgentDefinition, FunctionTool
 from openai.types.responses.response_input_param import FunctionCallOutput, ResponseInputParam
@@ -125,14 +124,14 @@ def main():
         # Create a thread for the chat session
         conversation = openai_client.conversations.create()
 
-        # Create a list to hold function call outputs that will be sent back as input to the agent
-        input_list: ResponseInputParam = []
-        
         while True:
             user_input = input("Enter a prompt for the astronomy agent. Use 'quit' to exit.\nUSER: ").strip()
             if user_input.lower() == "quit":
                 print("Exiting chat.")
                 break
+
+            # Create a list to hold function call outputs that will be sent back as input to the agent
+            input_list: ResponseInputParam = []
 
             # Send a prompt to the agent
             openai_client.conversations.items.create(
@@ -176,8 +175,8 @@ def main():
             # Send function call outputs back to the model and retrieve a response
             if input_list:
                 response = openai_client.responses.create(
+                    conversation=conversation.id,
                     input=input_list,
-                    previous_response_id=response.id,
                     extra_body={"agent_reference": {"name": agent.name, "type": "agent_reference"}},
                 )
             # Display the agent's response
