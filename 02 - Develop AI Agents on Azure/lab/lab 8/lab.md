@@ -1,5 +1,5 @@
-# Lab 8 - Search and Tools
+# Lab 8 - Orchestration
 
-7. What role grants read-only Azure AI Search queries?
-8. What is the purpose of MCP tool discovery?
-9. What should happen when an MCP call requires approval?
+22. When is sequential orchestration appropriate?
+23. What is a handoff pattern?
+24. When is agentic RAG preferable to classic RAG?

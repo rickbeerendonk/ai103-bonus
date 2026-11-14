@@ -1,5 +1,5 @@
-# Lab 4 - Content Understanding
+# Lab 4 - Content Safety
 
-10. What is an analyzer?
-11. What is the difference between `extract` and `classify`?
-12. Which content can a multimodal analyzer process?
+10. Name the four severity-based content categories.
+11. What is the difference between direct and indirect prompt attacks?
+12. What does protected-material detection address?

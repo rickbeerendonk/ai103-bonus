@@ -1,5 +1,5 @@
-# Lab 3 - Foundry Agents
+# Lab 3 - History and Memory
 
-7. What does a Foundry agent store server-side?
-8. What is the role of a thread or conversation?
-9. What should happen when a tool call requires approval?
+7. What is the difference between a conversation and persistent user memory?
+8. What should be persisted for long-lived chat history?
+9. Name one policy for bounding history growth.

@@ -2,14 +2,14 @@
 marp: true
 # Copyright © 2026 Rick Beerendonk
 theme: oblicum-marp-theme
-footer: "![](../../../marp/glasspaper-logo.svg) ![](../../../marp/oblicum-logo.svg)"
+footer: "![](../../marp/glasspaper-logo.svg) ![](../../marp/oblicum-logo.svg)"
 ---
 
 <!-- _class: lead -->
 
 # Develop Natural Language Solutions in Azure
 
-## Language, speech, and translation with Azure AI Services
+## Language, speech, and translation with Foundry Tools
 
 #### Rick Beerendonk<br>rick@oblicum.com
 
@@ -107,7 +107,7 @@ Both can read text. They fail in different ways.
 
 <!-- _class: lead -->
 
-# Azure Language Service
+# Azure Language
 
 ---
 
@@ -129,7 +129,7 @@ client = TextAnalyticsClient(endpoint="https://{resource}.services.ai.azure.com"
                               credential=DefaultAzureCredential())
 ```
 
-**Constraints:** max 5,120 characters per document; max 1,000 items per collection
+**Constraints:** max 5,120 characters per document; documents per request depend on the feature — 5 for NER and PII, 10 for sentiment and key phrases, 1,000 for language detection
 
 ---
 
@@ -145,7 +145,7 @@ for doc in result:
 **Edge cases:**
 
 - Multilingual text → returns dominant language with lower confidence
-- Unparseable text → `language = "(unknown)"`, `score = 0`
+- Unparseable text → `name = "(Unknown)"`, `confidence_score = 0`
 
 ---
 
@@ -170,6 +170,8 @@ for doc in result:
 - Includes positive + neutral → `positive`
 - Includes negative + neutral → `negative`
 - Positive + negative both present → `mixed`
+
+**Lifecycle:** sentiment analysis retires from Azure Language on 31 March 2029 — build new projects on a Foundry model
 
 ---
 
@@ -199,41 +201,31 @@ for doc in result:
         print(f"{entity.name} — {entity.data_source} — {entity.url}")
 ```
 
-**Entity linking** uses Wikipedia as knowledge base; disambiguates same-name entities by context (e.g., "Venus" → planet vs. mythology)
+**Entity linking** uses Wikipedia as knowledge base; disambiguates same-name entities by context (e.g., "Venus" → planet vs. mythology); it retires on 1 September 2028 — new projects use NER or a Foundry model
+
+---
+
+## Key Phrase Extraction
+
+```python
+result = client.extract_key_phrases([
+    "Microsoft launched its new AI product in Seattle this week."
+])
+for doc in result:
+    print(doc.key_phrases)  # ['new AI product', 'Microsoft', 'Seattle']
+```
+
+**Lifecycle:** key phrase extraction retires from Azure Language on 31 March 2029 — build new projects on a Foundry model
+
+---
+
+## Retrieval Practice — Lab 1
+
+Pause here and complete [Lab 1](../lab/lab%201/lab.md), then check its [solution](../lab/lab%201/solution.md).
 
 ---
 
 <!-- _class: fit-24 -->
-
-## Custom Named Entity Recognition
-
-**_[EXAM]_**
-
-Train a custom entity model when the prebuilt categories do not match your domain.
-
-**Problem:** a broad `ContactInfo` entity has **low precision** — it matches phone numbers, e-mail addresses, handles, and whatever sits near them.
-
-**Fix the definition, not the volume:** replace it with specific `Phone`, `Email`, and `SocialMedia` entity types and relabel the training data.
-
-| Tempting fix                   | Why it fails                             |
-| ------------------------------ | ---------------------------------------- |
-| Lower the confidence threshold | Returns **more** false positives         |
-| Auto-label the training data   | Reproduces the same ambiguous definition |
-| Add more training data         | More examples of an overly broad entity  |
-
-**Rule:** low precision caused by an ambiguous label is a schema problem, not a data-volume problem.
-
----
-
-<!-- _class: fit-28 -->
-
-## Retrieval Practice — Lab 1
-
-Pause here and complete [Lab 1](../lab/lab%201/lab.md) before continuing.
-
----
-
-<!-- _class: fit-16 -->
 
 ## Personally Identifiable Information (PII)
 
@@ -258,11 +250,20 @@ for doc in result:
 - Entity text, category, offset, length, and confidence score
 - Categories such as person, email, phone number, address, and government ID
 
-**What masking actually does** — the sensitive value is **removed**, not hidden alongside the original, and each value is replaced by its **category label**:
+---
+
+<!-- _class: fit-28 -->
+
+## PII Redaction
+
+**_[EXAM]_**
+
+**What masking actually does** — the sensitive value is **removed**, not hidden alongside the original. The redaction policy decides what replaces it: `characterMask` (the default) writes `*` for every character, `entityMask` writes the **category label**:
 
 ```text
-Input:  Contact Rick at rick@example.com or 555-0100.
-Output: Contact [PERSON] at [EMAIL] or [PHONENUMBER].
+Input:         Contact Rick at rick@example.com or 555-0100.
+characterMask: Contact **** at **************** or ********.
+entityMask:    Contact [PERSON_1] at [EMAIL_1] or [PHONENUMBER_1].
 ```
 
 **There is no overarching `Contact` category.** Detection uses specific categories (person, email, phone number), so a policy that must treat phone numbers differently from names can do so.
@@ -296,27 +297,60 @@ for item in response.categories_analysis:
 | ----------------- | ------------------------------------------------------------------------- |
 | **Options class** | `AnalyzeTextOptions`, with the input passed as the named `text` parameter |
 | **Client method** | `client.analyze_text(request)` — the synchronous `ContentSafetyClient`    |
-| **Result**        | Per-category severity, including self-harm                                |
+| **Result**        | Per-category severity: hate, sexual, violence, self-harm                  |
 
 **Content Safety is not PII detection:** it classifies harmful-content severity; it does not find or mask personal data.
 
 ---
 
-## Key Phrase Extraction
+## Retrieval Practice — Lab 2
 
-```python
-result = client.extract_key_phrases([
-    "Microsoft launched its new AI product in Seattle this week."
-])
-for doc in result:
-    print(doc.key_phrases)  # ['new AI product', 'Microsoft', 'Seattle']
-```
+Pause here and complete [Lab 2](../lab/lab%202/lab.md), then check its [solution](../lab/lab%202/solution.md).
 
 ---
 
-## Retrieval Practice — Lab 2
+<!-- _class: fit-32 -->
 
-Pause here and complete [Lab 2](../lab/lab%202/lab.md), then check its solution.
+## Guardrails and Responsible AI
+
+A severity score only helps when something acts on it.
+
+| Action       | What happens to the content                          |
+| ------------ | ---------------------------------------------------- |
+| **Block**    | It is rejected and does not continue                 |
+| **Annotate** | It continues, with the severity reported as metadata |
+
+- **Check input and output:** unsafe content can arrive in a prompt or be generated in the answer
+- **Use Block** when the content must not continue
+- **Transparency:** tell users how their data is processed and used — one of the six responsible AI principles
+
+---
+
+## Retrieval Practice — Lab 3
+
+Pause here and complete [Lab 3](../lab/lab%203/lab.md), then check its [solution](../lab/lab%203/solution.md).
+
+---
+
+<!-- _class: fit-28 -->
+
+## Private Networking for a Language Resource
+
+**_[EXAM]_**
+
+Analyzing confidential **on-premises** documents:
+
+1. Deploy the **Language resource**
+2. Add a **private endpoint** — the service gets a private IP inside your virtual network
+3. Connect from on-premises over **VPN or ExpressRoute**
+
+| Alternative               | Why it fails                                          |
+| ------------------------- | ----------------------------------------------------- |
+| Public endpoint           | The service stays reachable over the internet         |
+| VPN or ExpressRoute alone | Without a private endpoint the service is not private |
+| Managed identity          | Controls authentication, not network routing          |
+
+**Identity answers “who”; networking answers “from where.”**
 
 ---
 
@@ -326,7 +360,7 @@ Pause here and complete [Lab 2](../lab/lab%202/lab.md), then check its solution.
 
 ---
 
-<!-- _class: fit-20 -->
+<!-- _class: fit-18 -->
 
 ## Language MCP Endpoint and Tools
 
@@ -336,7 +370,7 @@ Pause here and complete [Lab 2](../lab/lab%202/lab.md), then check its solution.
 
 `https://{foundry-resource-name}.cognitiveservices.azure.com/language/mcp?api-version=2025-11-15-preview`
 
-**Tools exposed as MCP:**
+**Capabilities exposed as MCP tools:**
 
 | Tool                                  | Capability                                          |
 | ------------------------------------- | --------------------------------------------------- |
@@ -349,6 +383,8 @@ Pause here and complete [Lab 2](../lab/lab%202/lab.md), then check its solution.
 | Text Analytics for Health             | Medical entities (diagnoses, medications, symptoms) |
 | Conversational Language Understanding | Intent/entity extraction from custom trained model  |
 | Custom Question Answering             | Returns answers from a knowledge base               |
+
+**Lifecycle:** Sentiment Analysis, Summarization, Key Phrase Extraction, Conversational Language Understanding, and Custom Question Answering retire from Azure Language on 31 March 2029.
 
 ---
 
@@ -389,6 +425,8 @@ print(response.output_text)
 
 ---
 
+<!-- _class: fit-28 -->
+
 ## Speech-to-Text Models (OpenAI Audio API)
 
 ```python
@@ -396,7 +434,7 @@ from openai import AzureOpenAI
 
 client = AzureOpenAI(
     azure_endpoint=FOUNDRY_ENDPOINT, api_key=FOUNDRY_KEY,
-    api_version="2025-03-01-preview"
+    api_version="2025-04-01-preview"
 )
 
 audio_file = open("speech.mp3", "rb")
@@ -408,7 +446,8 @@ transcription = client.audio.transcriptions.create(
 print(transcription)
 ```
 
-**Models:** `gpt-4o-transcribe`, `gpt-4o-mini-transcribe`, `gpt-4o-transcribe-diarize`
+**Models:** `gpt-transcribe`, `whisper`; in preview: `gpt-4o-transcribe`, `gpt-4o-mini-transcribe`, `gpt-4o-transcribe-diarize`  
+**v1 route:** `/openai/v1/audio/…` is still preview and needs `api-version=preview`
 
 ---
 
@@ -424,8 +463,8 @@ with client.audio.speech.with_streaming_response.create(
     response.stream_to_file("speech_output.mp3")
 ```
 
-**Models:** `gpt-4o-tts`, `gpt-4o-mini-tts`  
-**Key parameters:** `voice` (e.g., `"alloy"`), `input` (text), `instructions` (tone/style)
+**Models (preview):** `gpt-4o-mini-tts`, `tts`, `tts-hd`  
+**Key parameters:** `voice` (e.g., `"alloy"`), `input` (text), `instructions` (tone/style; `gpt-4o-mini-tts` only)
 
 ---
 
@@ -453,7 +492,7 @@ with client.audio.speech.with_streaming_response.create(
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-22 -->
 
 ## SpeechConfig and Speech-to-Text
 
@@ -479,6 +518,8 @@ if result.reason == speech_sdk.ResultReason.RecognizedSpeech:
 
 **`ResultReason` values:** `RecognizedSpeech`, `NoMatch`, `Canceled`  
 **`SpeechRecognitionResult` properties:** `Duration`, `OffsetInTicks`, `Properties`, `Reason`, `ResultId`, `Text`
+
+**Continuous recognition:** `start_continuous_recognition()` with the `recognizing` (partial) and `recognized` (final) events — for ongoing or live audio; `recognize_once_async()` stops after one utterance
 
 ---
 
@@ -515,36 +556,13 @@ speech_config.speech_synthesis_voice_name = 'en-US-Brian:DragonHDLatestNeural'
 
 ---
 
-<!-- _class: fit-20 -->
+## Retrieval Practice — Lab 4
 
-## Custom Speech
-
-**_[EXAM]_**
-
-Train a custom speech-to-text model when base recognition mishears **product names, jargon, or accents**, then deploy it to a custom endpoint.
-
-**Workflow:** create a project → upload audio and transcripts → train → evaluate → deploy to an endpoint
-
-```python
-speech_config.endpoint_id = "<Custom Speech project ID>"
-```
-
-The REST request identifies the model by the **Custom Speech project ID** — not the project URL and not the endpoint URL.
-
-**When a custom model expires:**
-
-| Behavior                                                        | Correct? |
-| --------------------------------------------------------------- | -------- |
-| Requests fall back to the latest **base model** for that locale | **Yes**  |
-| Requests start returning 4xx errors                             | No       |
-| The expired model keeps serving until removed                   | No       |
-| The model is deleted automatically                              | No       |
-
-**Consequence:** recognition keeps working, but domain accuracy silently drops. Monitor expiry dates and retrain before them.
+Pause here and complete [Lab 4](../lab/lab%204/lab.md), then check its [solution](../lab/lab%204/solution.md).
 
 ---
 
-<!-- _class: fit-20 -->
+<!-- _class: fit-18 -->
 
 ## SSML
 
@@ -552,7 +570,8 @@ The REST request identifies the model by the **Custom Speech project ID** — no
 
 ```python
 ssml = """
-<speak xmlns:mstts="https://www.w3.org/2001/mstts" version="1.0" xml:lang="en-US">
+<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis"
+       xmlns:mstts="https://www.w3.org/2001/mstts" xml:lang="en-US">
   <voice name="en-US-JennyNeural">
     <mstts:express-as style="cheerful">
       Welcome to our service!
@@ -567,14 +586,49 @@ result = speech_synthesizer.speak_ssml_async(ssml).get()
 
 **SSML capabilities:** speaking style, pauses (`<break>`), phonemes (`<phoneme>`), prosody, say-as rules, recorded audio insertion
 
-| Requirement                                          | Use                                             |
-| ---------------------------------------------------- | ----------------------------------------------- |
-| Pronounce a technical term or product name precisely | **`<phoneme>`**                                 |
-| Read dates, numbers, or currency correctly           | `<say-as>`                                      |
-| Change rate, pitch, or volume                        | `<prosody>`                                     |
-| A brand-specific voice                               | Custom neural voice — requires training a model |
+| Requirement                                          | Use                                      |
+| ---------------------------------------------------- | ---------------------------------------- |
+| Pronounce a technical term or product name precisely | **`<phoneme>`**                          |
+| Read dates, numbers, or currency correctly           | `<say-as>`                               |
+| Change rate, pitch, or volume                        | `<prosody>`                              |
+| A brand-specific voice                               | Custom voice — requires training a model |
 
-**Least effort for pronunciation is `<phoneme>`**, not a custom neural voice.
+**Least effort for pronunciation is `<phoneme>`**, not a custom voice (formerly custom neural voice).
+
+---
+
+<!-- _class: fit-20 -->
+
+## Custom Speech
+
+**_[EXAM]_**
+
+Train a custom speech-to-text model when base recognition mishears **product names, jargon, or accents**, then deploy it to a custom endpoint.
+
+**Workflow:** create a project → upload audio and transcripts → train → evaluate → deploy to an endpoint
+
+```python
+speech_config.endpoint_id = "<custom endpoint ID>"
+```
+
+The SDK selects the deployed model by its **endpoint ID**. REST requests that create models and endpoints take the **Custom Speech project ID** in the `project` property — not the project URL and not the endpoint URL.
+
+**When a custom model expires:**
+
+| Behavior                                                        | Correct?                                         |
+| --------------------------------------------------------------- | ------------------------------------------------ |
+| Requests fall back to the latest **base model** for that locale | **Yes**                                          |
+| Requests start returning 4xx errors                             | No — only **batch transcription** fails this way |
+| The expired model keeps serving until removed                   | No                                               |
+| The model is deleted automatically                              | No                                               |
+
+**Consequence:** recognition keeps working, but domain accuracy silently drops. Monitor expiry dates and retrain before them.
+
+---
+
+## Retrieval Practice — Lab 5
+
+Pause here and complete [Lab 5](../lab/lab%205/lab.md), then check its [solution](../lab/lab%205/solution.md).
 
 ---
 
@@ -584,13 +638,13 @@ result = speech_synthesizer.speak_ssml_async(ssml).get()
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-24 -->
 
 ## Speech MCP Endpoint and Tools
 
 **Endpoint:**
 
-`https://{foundry-resource-name}.cognitiveservices.azure.com/speech/mcp`
+`https://{foundry-resource-name}.cognitiveservices.azure.com/speech/mcp?api-version=2025-11-15-preview`
 
 **Two tools:**
 
@@ -600,7 +654,7 @@ result = speech_synthesizer.speak_ssml_async(ssml).get()
 | **Text-to-speech** (Synthesize) | Neural voices (e.g., `en-US-JennyNeural`); WAV/MP3 output; URL returned                                       |
 
 **Storage requirement:** Azure Blob Storage account required for audio I/O  
-**SAS URL permissions required:** Read, Add, Create, Write, List
+**SAS URL permissions required:** Read and Write on the container (the official lab ticks Read, Add, Create, Write, and List)
 
 ---
 
@@ -613,15 +667,16 @@ from azure.ai.projects.models import MCPTool
 
 mcp_tool = MCPTool(
     server_label="azure-speech",
-    server_url="https://{foundry-resource-name}.cognitiveservices.azure.com/speech/mcp",
+    server_url="https://{foundry-resource-name}.cognitiveservices.azure.com/speech/mcp"
+               "?api-version=2025-11-15-preview",
     require_approval="always",
 )
 ```
 
 **Portal connection settings:**
 
-- `Foundry resource name`
-- `Bearer` (`Ocp-Apim-Subscription-Key`): project key
+- `foundry-resource-name`: name of the Foundry resource
+- `Bearer (API key)`: key of the Foundry resource, with the key name `Ocp-Apim-Subscription-Key`
 - `X-Blob-Container-Url`: SAS URL for blob container
 
 **Prompt-based customization:** Voice selection (`using the voice "en-GB-SoniaNeural"`), language (`es-ES`), phrase hints, profanity filtering
@@ -670,25 +725,25 @@ Record → transcribe → think → speak takes several seconds. In a conversati
 
 **Endpoints:**
 
-| Connection type     | Endpoint                                                                                  |
-| ------------------- | ----------------------------------------------------------------------------------------- |
-| Via Foundry project | `wss://{resource}.services.ai.azure.com/voice-live/realtime?api-version=2025-10-01`       |
-| Direct model        | `wss://{resource}.cognitiveservices.azure.com/voice-live/realtime?api-version=2025-10-01` |
+| Resource                | Endpoint                                                                                  |
+| ----------------------- | ----------------------------------------------------------------------------------------- |
+| Foundry resource        | `wss://{resource}.services.ai.azure.com/voice-live/realtime?api-version=2026-07-15`       |
+| Older resource (legacy) | `wss://{resource}.cognitiveservices.azure.com/voice-live/realtime?api-version=2026-07-15` |
 
-**Authentication (recommended):** Entra ID Bearer token; requires **Cognitive Services User** role  
-**API key auth:** `api-key` header (not browser-compatible)
+**Authentication (recommended):** Entra ID Bearer token; requires the **Cognitive Services User** and **Foundry User** (formerly Azure AI User) roles  
+**API key auth:** `api-key` header (not browser-compatible) or `api-key` query parameter
 
-**Why WebSocket:** one connection carrying bidirectional streaming audio at roughly 100 ms latency.
+**Why WebSocket:** one connection carrying bidirectional streaming audio with low latency — the server-to-server choice.
 
-| Transport | Why not                                             |
-| --------- | --------------------------------------------------- |
-| RTMP      | Built for one-way broadcast streaming               |
-| WebRTC    | Peer-to-peer, not this client-to-service channel    |
-| SIP       | Handles call signaling, not the audio stream itself |
+| Transport | Compared with WebSocket                                                              |
+| --------- | ------------------------------------------------------------------------------------ |
+| RTMP      | Not an option: built for one-way broadcast streaming                                 |
+| WebRTC    | Also supported (preview): audio straight from a browser or mobile app, lower latency |
+| SIP       | Not an option: handles call signaling, not the audio stream itself                   |
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-24 -->
 
 ## Key Events
 
@@ -708,7 +763,7 @@ Record → transcribe → think → speak takes several seconds. In a conversati
 | `response.done`                     | Response generation complete            |
 | `response.audio.delta`              | Audio chunk for playback                |
 | `input_audio_buffer.speech_started` | User started speaking — cancel playback |
-| `response.audio.transcript.done`    | Transcript of AI response ready         |
+| `response.audio_transcript.done`    | Transcript of AI response ready         |
 
 ---
 
@@ -729,7 +784,7 @@ Record → transcribe → think → speak takes several seconds. In a conversati
     "turn_detection": {
       "type": "azure_semantic_vad",
       "threshold": 0.5,
-      "prefix_padding_ms": 300,
+      "prefix_padding_ms": 420,
       "silence_duration_ms": 500
     },
     "input_audio_noise_reduction": { "type": "azure_deep_noise_suppression" },
@@ -742,29 +797,22 @@ Record → transcribe → think → speak takes several seconds. In a conversati
 
 ---
 
-## Retrieval Practice — Lab 3
-
-Pause here and complete [Lab 3](../lab/lab%203/lab.md), then check its solution.
-
----
-
 <!-- _class: lead -->
 
 # Translation
 
 ---
 
-<!-- _class: fit-20 -->
+<!-- _class: fit-18 -->
 
 ## Azure Translator — Text Translation
 
 **_[EXAM]_**
 
-**90+ languages; package:** `azure-ai-translation-text`
+**100+ languages; package:** `azure-ai-translation-text` (2.x)
 
 ```python
 from azure.ai.translation.text import TextTranslationClient
-from azure.ai.translation.text.models import InputTextItem
 from azure.core.credentials import AzureKeyCredential
 
 client = TextTranslationClient(credential=AzureKeyCredential("KEY"),
@@ -776,20 +824,20 @@ languages = client.get_supported_languages(scope="translation")
 
 # Translate (auto-detects source language)
 result = client.translate(
-    body=[InputTextItem(text="Hola"), InputTextItem(text="こんにちは")],
+    body=["Hola", "こんにちは"],
     to_language=["fr", "en"]
 )
 for doc in result:
     print(f"Detected: {doc.detected_language.language}")
     for t in doc.translations:
-        print(f"  {t.to}: {t.text}")
+        print(f"  {t.language}: {t.text}")
 ```
 
 **Mixed-language input:** split a segment containing multiple languages into single-language segments, then translate each segment separately. Automatic detection returns **one** language per segment, and forcing a single source language mistranslates the other one.
 
 ---
 
-<!-- _class: fit-24 -->
+<!-- _class: fit-22 -->
 
 ## Transliteration and Speech Translation
 
@@ -797,7 +845,7 @@ for doc in result:
 
 ```python
 result = client.transliterate(
-    body=[InputTextItem(text="こんにちは")],
+    body=["こんにちは"],
     language="ja", from_script="Jpan", to_script="Latn"
 )
 # → "Kon'nichiwa"
@@ -824,51 +872,9 @@ print(result.translations["ja"])   # "こんにちは。"
 
 ---
 
-## Retrieval Practice — Lab 4
+## Retrieval Practice — Lab 6
 
-Pause here and complete [Lab 4](../lab/lab%204/lab.md) before continuing.
-
----
-
-<!-- _class: fit-28 -->
-
-## Azure AI Immersive Reader
-
-**_[EXAM]_**
-
-**An assistive reading experience:** read-aloud, line focus, syllable breaking, picture dictionary, and single-word translation.
-
-**Choose it when** the requirement is **reading accessibility** — for example dyslexia support — with minimal setup.
-
-| Not this              | Because it                      |
-| --------------------- | ------------------------------- |
-| Document Intelligence | Extracts content from documents |
-| Azure Language        | Analyzes text                   |
-| Translator            | Converts languages              |
-
-None of them provide the assistive reading experience itself.
-
----
-
-<!-- _class: fit-28 -->
-
-## Private Networking for a Language Resource
-
-**_[EXAM]_**
-
-Analyzing confidential **on-premises** documents:
-
-1. Deploy the **Language resource**
-2. Add a **private endpoint** — the service gets a private IP inside your virtual network
-3. Connect from on-premises over **VPN or ExpressRoute**
-
-| Alternative               | Why it fails                                          |
-| ------------------------- | ----------------------------------------------------- |
-| Public endpoint           | The service stays reachable over the internet         |
-| VPN or ExpressRoute alone | Without a private endpoint the service is not private |
-| Managed identity          | Controls authentication, not network routing          |
-
-**Identity answers “who”; networking answers “from where.”**
+Pause here and complete [Lab 6](../lab/lab%206/lab.md), then check its [solution](../lab/lab%206/solution.md).
 
 ---
 
@@ -876,13 +882,12 @@ Analyzing confidential **on-premises** documents:
 
 ## Key Takeaways
 
-1. **TextAnalyticsClient** — language detection, sentiment, NER, key phrases, entity linking; 5,120 char / 1,000 item limits
-2. **Language MCP server** — 9 tools; agent decides which to use per prompt; `MCPTool` to attach
-3. **OpenAI audio models** — `gpt-4o-transcribe/tts` for GPT-integrated speech pipelines; API version `2025-03-01-preview`
+1. **TextAnalyticsClient** — language detection, NER, PII; sentiment, key phrases, and entity linking retire in 2028–2029; 5,120 characters per document, 5 to 1,000 documents per request
+2. **Language MCP server** — nine Language capabilities as tools; agent decides which to use per prompt; `MCPTool` to attach
+3. **OpenAI audio models** — `audio.transcriptions` with `gpt-transcribe`, `audio.speech` with `gpt-4o-mini-tts`; API version `2025-04-01-preview`
 4. **Azure Speech SDK** — `SpeechConfig`, `SpeechRecognizer`, `SpeechSynthesizer`; SSML for style control
 5. **Speech MCP server** — Blob Storage required for audio I/O; two tools: recognize + synthesize
 6. **Voice Live API** — WebSocket real-time speech; `session.update` with VAD, noise reduction, echo cancellation
 7. **Translation** — `TextTranslationClient`; `translate()` + `transliterate()`; `SpeechTranslationConfig` for spoken input
 8. **Live vs recorded** — real-time speech-to-text for live audio, batch transcription only for completed recordings
-9. **Custom NER** — fix low precision by narrowing the entity definition, not by lowering the threshold
-10. **Immersive Reader** — the reading-accessibility service; **private endpoint + VPN/ExpressRoute** — the network-isolation pattern
+9. **Private endpoint + VPN/ExpressRoute** — the network-isolation pattern

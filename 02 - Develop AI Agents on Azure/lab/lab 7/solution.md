@@ -1,5 +1,5 @@
 # Lab 7 - Solution
 
-4. A thread holds a conversation; persistent memory survives separate conversations.
-5. Messages or a durable summary in a persistent store.
-6. Sliding window, summarization, or token-budget trimming.
+19. Models lack private and current organizational data without retrieval.
+20. Indexed sources are ingested into a search index before query time; remote sources are queried live, when current data is needed.
+21. When to search, which source to use, how to cite, and what to do when no answer is found.

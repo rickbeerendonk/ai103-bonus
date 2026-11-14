@@ -1,5 +1,5 @@
 # Lab 3 - Solution
 
-7. `SpeechSynthesizer` and `speak_text_async()`.
-8. `SpeechRecognizer` and speech recognition methods.
-9. For ongoing or live audio streams and partial results.
+7. Transparency.
+8. Block rejects content; annotate allows it while reporting severity or metadata.
+9. Unsafe content can enter through input or be generated in output.

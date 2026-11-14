@@ -1,5 +1,5 @@
 # Lab 4 - Solution
 
-10. A configurable pipeline that extracts, classifies, or generates fields.
-11. `extract` returns fields; `classify` assigns a category or label.
-12. Supported multimodal content such as images and documents.
+10. Hate, sexual, violence, and self-harm.
+11. Direct attacks are in user input; indirect attacks are hidden in retrieved content.
+12. Copyrighted or otherwise protected text and code.

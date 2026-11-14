@@ -1,5 +1,5 @@
 # Lab 7 - Solution
 
-4. Security posture and threats.
-5. Security signals and incidents.
-6. Authentication proves identity; authorization determines permissions.
+19. It removes long-lived secrets and provides auditable identity-based access.
+20. Grant only the permissions required at the narrowest useful scope.
+21. Authentication proves identity; authorization determines permissions.

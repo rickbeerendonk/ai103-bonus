@@ -1,5 +1,7 @@
-# Lab 5 - Safety and Operations
+# Lab 5 - Safety
+
+Answer from memory after the matching lecture section:
 
 13. Name the four content-safety categories.
-14. What does HTTP 429 indicate, and which header gives the wait time?
-15. What does HTTP 410 mean for a retired model?
+14. Which blocking level is the most restrictive, and which one is the default?
+15. Which prompt shield is off by default, and when should you enable it?

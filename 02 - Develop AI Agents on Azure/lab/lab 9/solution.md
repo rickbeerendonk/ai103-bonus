@@ -1,5 +1,5 @@
 # Lab 9 - Solution
 
-10. Requested tokens are counted upfront and consume quota.
-11. For predictable reserved capacity and sustained load.
-12. It preserves behavior but requires manual migration at retirement.
+25. Unsupported answers when retrieved context lacks evidence.
+26. During each user turn, before or after generation.
+27. In CI or before deployment against a dataset.

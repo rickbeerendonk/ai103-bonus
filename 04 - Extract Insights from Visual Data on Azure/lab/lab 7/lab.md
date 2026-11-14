@@ -1,5 +1,5 @@
-# Lab 7 - Multimodal Input
+# Lab 7 - Document Intelligence
 
-4. When should you use a mask for image editing?
-5. What does a bounding polygon locate?
-6. Why can image text be an indirect attack?
+19. Which model preserves document layout and tables?
+20. Which output format supports structured downstream reasoning?
+21. Which parameter limits the analysis to a page range?

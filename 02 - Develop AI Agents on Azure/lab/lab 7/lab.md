@@ -1,5 +1,5 @@
-# Lab 7 - History and Memory
+# Lab 7 - Knowledge
 
-4. What is the difference between a thread and persistent user memory?
-5. What should be persisted for long-lived chat history?
-6. Name one policy for bounding history growth.
+19. Why does an agent need retrieval grounding?
+20. What is the difference between indexed and remote knowledge sources?
+21. What should retrieval instructions specify?

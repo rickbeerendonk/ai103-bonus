@@ -1,5 +1,7 @@
-# Lab 10 - Access Control
+# Lab 10 - Security
 
-13. Why prefer managed identity over a stored key?
-14. What does least privilege require?
-15. How can diagnostic logs support an incident investigation?
+Answer from memory after the matching lecture section:
+
+28. What does Defender for Cloud measure?
+29. What does Microsoft Sentinel correlate?
+30. How can diagnostic logs support an incident investigation?

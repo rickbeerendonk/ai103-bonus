@@ -1,5 +1,5 @@
-# Lab 9 - Model Operations
+# Lab 9 - Retrieval Quality
 
-10. What does `max_tokens` affect during rate-limit estimation?
-11. When is PTU appropriate?
-12. What does `NoAutoUpgrade` trade away?
+25. What problem does a groundedness gate prevent?
+26. When should a runtime gate run?
+27. When should batch evaluation run?

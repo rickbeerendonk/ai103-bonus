@@ -1,5 +1,5 @@
-# Lab 9 - Speech and Workflow
+# Lab 9 - Search and Privacy
 
-10. What event supports voice-agent barge-in?
-11. What reduces the wait before a real-time response?
-12. Which expression tests that a variable has a value?
+25. What sequence rotates a compromised Search key with minimal downtime?
+26. Which projections fit JSON objects and tabular text?
+27. Which three actions implement group-based document filtering?

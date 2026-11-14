@@ -1,5 +1,5 @@
-# Lab 2 - Tools
+# Lab 2 - Model Operations
 
-4. When should you use a custom function tool?
-5. What does an OpenAPI tool describe?
-6. What does an MCP server provide to a client?
+4. What does the output token limit (`max_output_tokens` or `max_completion_tokens`) affect during rate-limit estimation?
+5. When is PTU appropriate?
+6. What does `NoAutoUpgrade` trade away?

@@ -1,5 +1,5 @@
 # Lab 2 - Solution
 
-4. Use it for a business operation not exposed by another tool.
-5. It describes an HTTP API, operations, parameters, and schemas.
-6. Discoverable tool definitions and invocation through MCP.
+4. Requested tokens are counted upfront and consume quota.
+5. For predictable reserved capacity and sustained load.
+6. It preserves behavior but requires manual migration at retirement.

@@ -2,7 +2,7 @@
 marp: true
 # Copyright © 2026 Rick Beerendonk
 theme: oblicum-marp-theme
-footer: "![](../../../marp/glasspaper-logo.svg) ![](../../../marp/oblicum-logo.svg)"
+footer: "![](../../marp/glasspaper-logo.svg) ![](../../marp/oblicum-logo.svg)"
 ---
 
 <!-- _class: lead fit-28 -->
@@ -55,7 +55,7 @@ That place is **Microsoft Foundry**. Everything in this presentation is one of t
   ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
   ┃  Foundry resource        (the Azure resource)     ┃
   ┃    ┗━━ Project           (what your code calls)   ┃
-  ┃          ┣━━ Model deployment   gpt-4o            ┃
+  ┃          ┣━━ Model deployment   gpt-5.2           ┃
   ┃          ┣━━ Tools              code, web, files  ┃
   ┃          ┗━━ Knowledge          your documents    ┃
   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
@@ -74,7 +74,7 @@ One resource holds projects. A project holds everything one application needs.
 
 | Term           | In plain words                                                           |
 | -------------- | ------------------------------------------------------------------------ |
-| **Model**      | The trained brain, e.g. `gpt-4o`. You cannot call it directly            |
+| **Model**      | The trained brain, e.g. `gpt-5.2`. You cannot call it directly           |
 | **Deployment** | Your named, callable copy of a model, with its own quota and filters     |
 | **Endpoint**   | The URL your code sends requests to                                      |
 | **Inference**  | One call to the model — sending text and getting text back               |
@@ -88,7 +88,7 @@ Every later slide uses these words. Come back here whenever one stops making sen
 
 ---
 
-<!-- _class: fit-24 -->
+<!-- _class: fit-20 -->
 
 ## Life of One Request
 
@@ -122,7 +122,7 @@ Everything in this presentation happens somewhere in these seven steps.
 
 <!-- _class: lead fit-28 -->
 
-# Azure AI Foundry
+# Microsoft Foundry
 
 ---
 
@@ -134,7 +134,7 @@ Everything in this presentation happens somewhere in these seven steps.
 
 | Capability           | What you get                                                                 |
 | -------------------- | ---------------------------------------------------------------------------- |
-| **Model catalog**    | 1,900+ models from Microsoft, OpenAI, Meta, Mistral, Hugging Face, Anthropic |
+| **Model catalog**    | 10,000+ models from Microsoft, OpenAI, Meta, Mistral, Hugging Face, Anthropic |
 | **Model deployment** | Deploy, version, and scale models                                            |
 | **Foundry Tools**    | Language, Speech, Translator, Document Intelligence, Content Understanding   |
 | **Agents**           | Build and host AI agents with tools and knowledge                            |
@@ -164,11 +164,13 @@ Everything in this presentation happens somewhere in these seven steps.
 | Project (Foundry SDK)     | `https://{resource-name}.services.ai.azure.com/api/projects/{project-name}` |
 | Azure OpenAI (OpenAI SDK) | `https://{resource-name}.openai.azure.com/openai/v1`                        |
 
+API keys work only on the Azure OpenAI endpoint; the project endpoint takes Microsoft Entra ID.
+
 **Minimum administration to connect an app:** the **endpoint URI plus a subscription key**. OAuth tokens, SAS tokens, and certificate-based managed identity all add credential setup to manage.
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-24 -->
 
 ## Plan the AI Solution
 
@@ -191,15 +193,7 @@ Everything in this presentation happens somewhere in these seven steps.
 
 ---
 
-<!-- _class: fit-28 -->
-
-## Retrieval Practice — Lab 1
-
-Pause here and complete [Lab 1](../lab/lab%201/lab.md) before continuing. Use the matching solution only after attempting each question.
-
----
-
-<!-- _class: fit-28 -->
+<!-- _class: fit-24 -->
 
 ## Foundry Tools
 
@@ -228,7 +222,7 @@ Pause here and complete [Lab 1](../lab/lab%201/lab.md) before continuing. Use th
 | Tool                                       | Best for                                                         |
 | ------------------------------------------ | ---------------------------------------------------------------- |
 | **Microsoft Foundry portal**               | Explore models, test prompts, configure agents and tools         |
-| **Visual Studio Code + Foundry extension** | Code-first development, YAML, source control                     |
+| **Visual Studio Code + Foundry Toolkit**   | Code-first development, YAML, source control                     |
 | **Microsoft Foundry SDK**                  | Automate projects, models, agents, evaluations, and connections  |
 | **OpenAI SDK**                             | Portable chat and Responses API application code                 |
 | **Azure service SDKs**                     | Focused APIs such as Language, Speech, and Document Intelligence |
@@ -245,7 +239,7 @@ Pause here and complete [Lab 1](../lab/lab%201/lab.md) before continuing. Use th
 | ------------------------------------- | ---------------------------- |
 | Agents, evaluations, tracing          | Maximum OpenAI compatibility |
 | Connections, project governance       | Portability across providers |
-| Foundry direct models (Phi, DeepSeek) | Simple chat inference        |
+| Catalog models beyond Azure OpenAI    | Simple chat inference        |
 
 ```text
 pip install azure-ai-projects azure-identity openai
@@ -262,14 +256,14 @@ from azure.identity import DefaultAzureCredential
 from azure.ai.projects import AIProjectClient
 
 project_client = AIProjectClient(
-    credential=DefaultAzureCredential(),
-    endpoint="https://{resource-name}.services.ai.azure.com/api/projects/{project-name}"
+    endpoint="https://{resource-name}.services.ai.azure.com/api/projects/{project-name}",
+    credential=DefaultAzureCredential()
 )
 
-openai_client = project_client.get_openai_client(api_version="2024-10-21")
+openai_client = project_client.get_openai_client()
 ```
 
-**Note:** `credential` is the first parameter, `endpoint` is second
+**Note:** `endpoint` is the first parameter, `credential` is second
 
 ---
 
@@ -295,7 +289,7 @@ openai_client = OpenAI(
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-20 -->
 
 ## RBAC Roles for Inference
 
@@ -303,14 +297,17 @@ openai_client = OpenAI(
 
 Authentication proves _who_ you are. RBAC decides _what you may do_. `DefaultAzureCredential` plus `az login` still returns **HTTP 403** without the right role.
 
-| Role                               | Grants                                         |
-| ---------------------------------- | ---------------------------------------------- |
-| **Cognitive Services OpenAI User** | Call model inference — least privilege choice  |
-| Cognitive Services User            | Read resource, list keys — no OpenAI inference |
-| Cognitive Services Data Reader     | Read data — no inference                       |
-| Contributor                        | Full resource management — far too broad       |
+| Role                                      | Grants                                                            |
+| ----------------------------------------- | ----------------------------------------------------------------- |
+| **Foundry User** (formerly Azure AI User) | Build in a project and call models — least privilege choice       |
+| Foundry Agent Consumer                    | Call agent endpoints only                                         |
+| Foundry Project Manager, Account Owner    | Manage projects, resources, and role assignments — far too broad  |
+| **Cognitive Services OpenAI User**        | Completion and embedding calls on an Azure OpenAI resource        |
+| Cognitive Services User                   | All data actions and list keys — more than inference needs        |
+| Cognitive Services Data Reader            | Read data — no inference                                          |
+| Contributor                               | Full resource management — far too broad                          |
 
-**Rule:** for an app that only sends prompts, assign **Cognitive Services OpenAI User**.
+**Rule:** for an app that only sends prompts to a Foundry resource, assign **Foundry User**. Roles that start with "Cognitive Services" are meant for standalone AI services resources: on an Azure OpenAI resource the least-privilege choice is **Cognitive Services OpenAI User**.
 
 ---
 
@@ -325,7 +322,7 @@ Authentication proves _who_ you are. RBAC decides _what you may do_. `DefaultAzu
 | Choice          | Value                                                              |
 | --------------- | ------------------------------------------------------------------ |
 | HTTP method     | **`PUT`** — creates a named ARM resource (`.../accounts/CS1`)      |
-| Resource `kind` | **`CognitiveServices`** — the all-in-one multi-service kind        |
+| Resource `kind` | **`CognitiveServices`** — multi-service (`AIServices` = Foundry)   |
 | Single-service  | `TextAnalytics`, `ComputerVision` — separate key and endpoint each |
 
 `POST` is for action endpoints; `PATCH` only updates an existing resource.
@@ -339,21 +336,22 @@ az cognitiveservices account create --kind OpenAI \
 
 `keySource` defaults to `Microsoft.CognitiveServices` (Microsoft-managed key). Set it to **`Microsoft.KeyVault`** for CMK.
 
-**Deploy an image model (DALL-E, gpt-image-1):** use **Microsoft Foundry** and the **Azure CLI**. Microsoft Graph is for Microsoft 365 data, not model deployment.
+**Deploy an image model (gpt-image-2):** use **Microsoft Foundry** and the **Azure CLI**. Microsoft Graph is for Microsoft 365 data, not model deployment.
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-24 -->
 
 ## Connections in Bicep
 
 **_[EXAM]_**
 
-A project **connection** stores where a dependency lives and how to authenticate to it, so applications and agents do not carry credentials.
+A **connection** stores where a dependency lives and how to authenticate to it, so applications and agents do not carry credentials. The Key Vault connection is created on the Foundry resource.
 
 ```text
-resource kvConnection 'Microsoft.CognitiveServices/accounts/projects/connections@2025-04-01-preview' = {
+resource kvConnection 'Microsoft.CognitiveServices/accounts/connections@2025-04-01-preview' = {
   name: 'kv-connection'
+  parent: foundryResource
   properties: {
     category: 'AzureKeyVault'          // must match the resource class
     target: existingKeyVault.id
@@ -383,20 +381,20 @@ resource kvConnection 'Microsoft.CognitiveServices/accounts/projects/connections
 
 ## Model Catalog
 
-**1,900+ models — category overview:**
+**10,000+ models — category overview:**
 
 | Category             | Examples                                       |
 | -------------------- | ---------------------------------------------- |
-| **LLMs**             | GPT-5, Mistral Large, Llama 3 70B              |
-| **SLMs**             | Phi-4, Mistral OSS, Llama 3 8B                 |
-| **Reasoning**        | o-series (handles chain-of-thought internally) |
+| **LLMs**             | GPT-5.2, Mistral Large, Llama 3.3 70B          |
+| **SLMs**             | Phi-4, Phi-4-mini, Mistral Small               |
+| **Reasoning**        | GPT-5 series (chain-of-thought is internal)    |
 | **Embedding**        | text-embedding-3-large                         |
-| **Image generation** | gpt-image-1, FLUX                              |
+| **Image generation** | gpt-image-2, FLUX                              |
 | **Video generation** | Sora 2                                         |
-| **TTS / STT**        | gpt-4o-tts, gpt-4o-transcribe                  |
-| **Multimodal**       | gpt-4.1, Phi-4-multimodal-instruct             |
+| **TTS / STT**        | gpt-4o-mini-tts, gpt-4o-mini-transcribe        |
+| **Multimodal**       | gpt-5.2, Phi-4-multimodal-instruct             |
 
-**Chat vs Reasoning:** Non-reasoning models benefit from chain-of-thought prompting; o-series handle it internally — don't add "take a step-by-step approach" to o-series prompts
+**Chat vs Reasoning:** Non-reasoning models benefit from chain-of-thought prompting; reasoning models handle it internally — don't add "take a step-by-step approach" to their prompts
 
 ---
 
@@ -410,8 +408,8 @@ You never call a model. You call **your deployment of** that model.
   Model in the catalog        Your deployment
   (shared, read-only)         (yours, named, configurable)
 
-      gpt-4o          ━━━▶    "chat-prod"   quota, filters, version
-      gpt-4o          ━━━▶    "chat-test"   smaller quota, looser filters
+      gpt-5.2         ━━━▶    "chat-prod"   quota, filters, version
+      gpt-5.2         ━━━▶    "chat-test"   smaller quota, looser filters
 ```
 
 The deployment carries the things you control: **name, capacity, content filters, and version policy**. Two deployments of the same model can behave differently.
@@ -421,6 +419,14 @@ The deployment carries the things you control: **name, capacity, content filters
 ---
 
 <!-- _class: fit-28 -->
+
+## Retrieval Practice — Lab 1
+
+Pause here and complete [Lab 1](../lab/lab%201/lab.md), then check its [solution](../lab/lab%201/solution.md).
+
+---
+
+<!-- _class: fit-20 -->
 
 ## Deployment Types
 
@@ -436,7 +442,7 @@ The deployment carries the things you control: **name, capacity, content filters
 | **Data Zone Batch**          | Async + data zone                     | Batch + data compliance             |
 | **Standard**                 | Single region, no rerouting           | Single-region pinning               |
 | **Regional Provisioned**     | Dedicated, single region              | Single-region + dedicated capacity  |
-| **Developer**                | Fine-tuned model evaluation only      | Testing fine-tuned variants         |
+| **Developer**                | Fine-tuned model evaluation, 24 hours | Testing fine-tuned variants         |
 
 **Use Global Standard whenever possible for maximum capabilities**
 
@@ -444,13 +450,13 @@ The deployment carries the things you control: **name, capacity, content filters
 
 <!-- _class: fit-24 -->
 
-## Choosing a Deployment — Three Questions
+## Choosing a Deployment — Four Questions
 
 **_[EXAM]_**
 
 **1. Where may the data be processed?**
 
-`Global` routes to any region with capacity — it **breaks an EU-only residency rule**. Use **Data Zone** for an EU/US boundary, or **Standard** (single region) to pin one region.
+`Global` routes to any region with capacity — it **breaks an EU-only residency rule**. Use **Data Zone** for an EU, US, or APAC boundary, or **Standard** (single region) to pin one region.
 
 **2. Is the demand steady or variable?**
 
@@ -460,7 +466,9 @@ The deployment carries the things you control: **name, capacity, content filters
 
 `Batch` is asynchronous. Real-time REST → **Standard**, which is managed and does **not consume your VM vCPU quota** (a self-hosted container does).
 
-**4. Must behavior stay stable?** Set the version-update policy to **`OnceCurrentVersionExpired`** so the version only changes at retirement.
+**4. Must behavior stay stable?**
+
+Set the version-update policy to **`OnceCurrentVersionExpired`** so the version only changes at retirement.
 
 ---
 
@@ -480,11 +488,11 @@ The deployment carries the things you control: **name, capacity, content filters
 **Model cascade** — do not pick one model for everything:
 
 ```text
-  simple FAQ request  ━▶  small model   cheap, fast
-  complex reasoning   ━▶  large model   accurate
+  simple FAQ request  ━▶  gpt-5-mini   small model: cheap, fast
+  complex reasoning   ━▶  gpt-5.2      large model: accurate
 ```
 
-A router classifies each request first. Sending everything to the smallest model loses quality; sending everything to the largest keeps cost and latency high; raising `max_tokens` for all requests only adds cost.
+A router classifies each request first. Sending everything to the smallest model loses quality; sending everything to the largest keeps cost and latency high; raising `max_output_tokens` for all requests only adds cost.
 
 ---
 
@@ -494,16 +502,16 @@ A router classifies each request first. Sending everything to the smallest model
 
 **Quality Index:** 0–1 average across 8 benchmarks (higher = better)
 
-| Benchmark      | Tests                           |
-| -------------- | ------------------------------- |
-| Arena-Hard     | Open-ended conversation quality |
-| BIG-Bench Hard | Challenging reasoning tasks     |
-| GPQA           | Graduate-level science Q&A      |
-| HumanEval+     | Code generation                 |
-| MBPP+          | Python problem solving          |
-| MATH           | Mathematical reasoning          |
-| MMLU-Pro       | Multi-domain knowledge          |
-| IFEval         | Instruction following           |
+| Benchmark          | Tests                           |
+| ------------------ | ------------------------------- |
+| BIG-Bench Hard     | Challenging reasoning tasks     |
+| MuSR               | Multi-step reasoning            |
+| GPQA               | Graduate-level science Q&A      |
+| MMLU-Pro           | Multi-domain knowledge          |
+| MBPP+              | Python problem solving          |
+| ChemBench          | Chemistry                       |
+| FrontierScience    | Scientific reasoning            |
+| τ²-bench (telecom) | Agentic tool-call selection     |
 
 ---
 
@@ -519,13 +527,13 @@ A router classifies each request first. Sending everything to the smallest model
 | ToxiGen   | F1 (toxicity detection)      | Higher    |
 | WMDP      | Hazardous knowledge accuracy | Lower     |
 
-**Cost:** per 1M input tokens, per 1M output tokens, estimated cost (3:1 input:output ratio)
+**Cost:** in USD — lower is better
 
-**Performance:** Latency mean, Latency P50, Throughput (TPM, tokens per second)
+**Performance:** Latency mean and percentiles (P50–P99), time to first token (TTFT), Throughput (generated and total tokens per second)
 
 ---
 
-<!-- _class: fit-24 -->
+<!-- _class: fit-20 -->
 
 ## Evaluating a Model
 
@@ -545,7 +553,7 @@ A router classifies each request first. Sending everything to the smallest model
 | **Coherence**        | Is it logically structured?              |
 | **Fluency**          | Is the language natural and correct?     |
 
-**Safety metrics:** Defect rate = (true harmful instances / total) × 100  
+**Safety metrics:** severity score 0–7 per response; above the threshold (default 3) it fails. Defect rate = share of responses that fail  
 Evaluators: Self-harm, Hateful & unfair, Violent, Sexual, Protected material, Indirect attack
 
 **NLP metrics (no evaluator LLM needed):** F1, BLEU, METEOR, ROUGE, GLEU
@@ -558,7 +566,7 @@ Evaluators: Self-harm, Hateful & unfair, Violent, Sexual, Protected material, In
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-24 -->
 
 ## Responses API (Recommended for New Development)
 
@@ -566,10 +574,10 @@ Evaluators: Self-harm, Hateful & unfair, Violent, Sexual, Protected material, In
 
 ```python
 response = openai_client.responses.create(
-    model="gpt-4o",
+    model="gpt-5.2",
     input="What is the capital of France?",
     instructions="You are a helpful assistant.",
-    temperature=0.7,
+    reasoning={"effort": "low"},
     max_output_tokens=200,
 )
 
@@ -579,7 +587,7 @@ print(response.status)
 print(response.usage.total_tokens)
 ```
 
-**Works with:** Azure OpenAI models AND Foundry direct models (Phi, DeepSeek, etc.)
+**Works with:** Azure OpenAI models and other Foundry Models sold by Azure (DeepSeek, Mistral)
 
 ---
 
@@ -593,8 +601,9 @@ print(response.usage.total_tokens)
 
 ```python
 response2 = openai_client.responses.create(
-    model="gpt-4o",
+    model="gpt-5.2",
     input="What about Paris specifically?",
+    instructions="You are a helpful assistant.",  # not carried over: send again
     previous_response_id=response1.id,
 )
 ```
@@ -608,7 +617,7 @@ messages = [
     {"role": "assistant", "content": response1.output_text},
     {"role": "user", "content": "Tell me more."},
 ]
-response2 = openai_client.responses.create(model="gpt-4o", input=messages)
+response2 = openai_client.responses.create(model="gpt-5.2", input=messages)
 ```
 
 ---
@@ -625,19 +634,11 @@ Use a **conversation** when an agent must reuse complete interaction history acr
 
 ---
 
-<!-- _class: fit-28 -->
-
-## Retrieval Practice — Lab 2
-
-Pause here and complete [Lab 2](../lab/lab%202/lab.md), then check its [solution](../lab/lab%202/solution.md).
-
----
-
-<!-- _class: fit-20 -->
+<!-- _class: fit-18 -->
 
 ## Persisting Conversation History
 
-`previous_response_id` and manual history both reset when the session ends. For multi-session or multi-user apps, **persist the messages array externally**.
+Manual history is gone when the session ends, and a stored response behind `previous_response_id` is kept for 30 days by default. For multi-session or multi-user apps, **persist the messages array externally**.
 
 ```python
 import json
@@ -653,7 +654,7 @@ db.save(user_id, json.dumps(history))
 # Start of next session — reload
 history = json.loads(db.load(user_id))
 history.append({"role": "user", "content": new_input})
-response = openai_client.responses.create(model="gpt-4o", input=history)
+response = openai_client.responses.create(model="gpt-5.2", input=history)
 history.append({"role": "assistant", "content": response.output_text})
 db.save(user_id, json.dumps(history))
 ```
@@ -673,24 +674,25 @@ db.save(user_id, json.dumps(history))
 ## Streaming
 
 ```python
-with openai_client.responses.create(
-    model="gpt-4o",
+stream = openai_client.responses.create(
+    model="gpt-5.2",
     input="Tell me a long story.",
     stream=True,
-) as stream:
-    for event in stream:
-        print(event)
+)
+for event in stream:
+    if event.type == "response.output_text.delta":
+        print(event.delta, end="")
 ```
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-24 -->
 
 ## ChatCompletions API (Portability)
 
 ```python
 response = openai_client.chat.completions.create(
-    model="gpt-4o",
+    model="gpt-5.2",
     messages=[
         {"role": "system", "content": "You are a helpful assistant."},
         {"role": "user", "content": "What is the capital of France?"},
@@ -709,13 +711,21 @@ print(response.choices[0].message.content)
 
 ---
 
+<!-- _class: fit-28 -->
+
+## Retrieval Practice — Lab 2
+
+Pause here and complete [Lab 2](../lab/lab%202/lab.md), then check its [solution](../lab/lab%202/solution.md).
+
+---
+
 <!-- _class: lead fit-28 -->
 
 # Tools
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-24 -->
 
 ## Tools in the Responses API
 
@@ -726,7 +736,7 @@ print(response.choices[0].message.content)
 | Tool             | Type name            | Capability                        |
 | ---------------- | -------------------- | --------------------------------- |
 | Code interpreter | `code_interpreter`   | Sandboxed Python runtime          |
-| Web search       | `web_search_preview` | Live web retrieval                |
+| Web search       | `web_search`         | Live web retrieval                |
 | File search      | `file_search`        | Vector search over uploaded files |
 | Function         | `function`           | Custom application logic          |
 
@@ -734,7 +744,7 @@ print(response.choices[0].message.content)
 response = client.responses.create(
     model=DEPLOYMENT,
     input=[{"role": "user", "content": "What is the square root of 16?"}],
-    tools=[{"type": "code_interpreter"}]
+    tools=[{"type": "code_interpreter", "container": {"type": "auto"}}]
 )
 print(response.output_text)  # "The square root of 16 is 4."
 ```
@@ -758,8 +768,8 @@ print(response.output_text)  # "The square root of 16 is 4."
 
 **`web_search`** — model retrieves current information from the web:
 
-- Use type name `"web_search_preview"` with Microsoft Foundry
-- Also named **Grounding with Bing Search** `"bing_grounding"` in Foundry agents and exam wording
+- Use type name `"web_search"` (formerly `"web_search_preview"`)
+- Runs on Bing; the **Grounding with Bing Search** tool `"bing_grounding"` in Foundry agents does the same through a Bing connection
 - Model decides when to search; issues query automatically
 - Produces source-grounded answers for time-sensitive topics
 - Adds latency and token usage; source quality varies
@@ -849,7 +859,7 @@ Pause here and complete [Lab 3](../lab/lab%203/lab.md), then check its [solution
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-24 -->
 
 ## Prompt Components and Patterns
 
@@ -873,25 +883,25 @@ Use delimiters (`---`, Markdown headings, XML tags) to separate sections; watch 
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-24 -->
 
 ## Model Parameters
 
 **_[EXAM]_**
 
-**Temperature:** higher = creative; lower = deterministic  
-**Top P:** limits vocabulary to top P probability mass
+**Reasoning effort:** how much the model thinks before it answers  
+**Output token limit:** the most tokens it may generate, reasoning included
 
-**Adjust temperature OR top_p — not both**
+| Control             | Low value                                 | High value                             |
+| ------------------- | ----------------------------------------- | -------------------------------------- |
+| Reasoning effort    | Faster and cheaper — simple summaries     | Slower and costlier — hard problems    |
+| `max_output_tokens` | Short answer, may be cut off at the limit | Room for reasoning and a full answer   |
 
-| Parameter     | Low value                 | High value         |
-| ------------- | ------------------------- | ------------------ |
-| `temperature` | Deterministic, consistent | Creative, varied   |
-| `top_p`       | Constrained vocabulary    | Diverse vocabulary |
+**Where to set them:** `reasoning={"effort": "low"}` and `max_output_tokens` in the Responses API; `reasoning_effort="low"` and `max_completion_tokens` in Chat Completions. Effort values include `none`, `low`, `medium`, and `high`; which ones are accepted differs per model.
 
-**Reasoning models are different:** when extended reasoning (`thinking`) is enabled, `temperature` **must be `1`** or omitted — `0` or `2` fails validation with HTTP 400. Control effort with the reasoning-effort setting (`low` for simple summaries) instead.
+Reasoning models are controlled with the reasoning effort; with reasoning switched on, `temperature` and `top_p` are rejected.
 
-**Consistency vs completeness:** lower `temperature` makes wording repeatable. It does **not** add missing content, and neither does raising `max_tokens` on its own.
+**Cut off vs incomplete:** raise `max_output_tokens` when the answer stops at the limit. It does **not** add content the model never wrote.
 
 ---
 
@@ -905,9 +915,7 @@ Use delimiters (`---`, Markdown headings, XML tags) to separate sections; watch 
 
 No parameter can add content that was never generated:
 
-- ❌ Lower `temperature` — only makes wording repeatable
-- ❌ Higher `temperature` — only adds randomness
-- ❌ Lower `max_tokens` — truncates even more
+- ❌ Lower `max_output_tokens` — truncates even more
 - ❌ Switch model without measuring — unproven
 - ❌ Block the failing response — detects the gap, does not fill it
 
@@ -921,7 +929,7 @@ if review.missing:
 return answer
 ```
 
-Raising `max_tokens` is a valid **supporting** fix — it permits a complete answer, but it does not produce one.
+Raising `max_output_tokens` is a valid **supporting** fix — it permits a complete answer, but it does not produce one.
 
 ---
 
@@ -968,7 +976,7 @@ The model is never retrained. You simply hand it the right page before it answer
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-24 -->
 
 ## Two Types of RAG — Classic vs Agentic
 
@@ -984,7 +992,7 @@ The model is never retrained. You simply hand it the right page before it answer
 
 ---
 
-<!-- _class: fit-20 -->
+<!-- _class: fit-18 -->
 
 ## RAG — Groundedness Gate
 
@@ -998,7 +1006,7 @@ The model is never retrained. You simply hand it the right page before it answer
 
 ```python
 check = openai_client.responses.create(
-    model="gpt-4o",
+    model="gpt-5.2",
     instructions="Answer only YES or NO.",
     input=f"Does this context contain enough information to answer: '{query}'?\n\nContext:\n{context}"
 )
@@ -1013,6 +1021,7 @@ else:
 ```python
 from azure.ai.evaluation import GroundednessEvaluator
 
+evaluator = GroundednessEvaluator(model_config)
 score = evaluator(query=query, context=context, response=answer)
 if score["groundedness"] < 3:
     return "I cannot answer reliably from the available documents."
@@ -1054,6 +1063,14 @@ Can combine methods (e.g., SFT first, then DPO for alignment)
 ```
 
 **Always establish a baseline before fine-tuning**
+
+---
+
+<!-- _class: fit-28 -->
+
+## Retrieval Practice — Lab 4
+
+Pause here and complete [Lab 4](../lab/lab%204/lab.md), then check its [solution](../lab/lab%204/solution.md).
 
 ---
 
@@ -1099,14 +1116,6 @@ Can combine methods (e.g., SFT first, then DPO for alignment)
 
 <!-- _class: fit-28 -->
 
-## Retrieval Practice — Lab 4
-
-Pause here and complete [Lab 4](../lab/lab%204/lab.md), then check its [solution](../lab/lab%204/solution.md).
-
----
-
-<!-- _class: fit-28 -->
-
 ## Map Stage
 
 1. **Identify harms** — by scenario, user type, potential misuse
@@ -1141,7 +1150,7 @@ No single layer stops everything. They are checkpoints a request passes through.
       ┃
   [3] system message     rules + grounding data in the prompt
       ┃
-  [2] safety system      content filters, prompt shields
+  [2] safety system      guardrails, prompt shields
       ┃
   [1] model              a safer base model, or fine-tuned
       ┃
@@ -1151,7 +1160,7 @@ No single layer stops everything. They are checkpoints a request passes through.
 | Layer                             | Description                                                          |
 | --------------------------------- | -------------------------------------------------------------------- |
 | **1. Model layer**                | Select an appropriate model; fine-tune for safer behavior            |
-| **2. Safety system**              | Content filters (input/output) + prompt shields + protected material |
+| **2. Safety system**              | Guardrails (input/output) + prompt shields + protected material      |
 | **3. System message & grounding** | Behavioral parameters + RAG grounding                                |
 | **4. User experience**            | UI controls, input validation, transparency                          |
 
@@ -1159,24 +1168,24 @@ No single layer stops everything. They are checkpoints a request passes through.
 
 <!-- _class: fit-28 -->
 
-## Configure Content Filters
+## Configure Guardrails
 
 **_[EXAM]_**
 
-Content filters are configured per deployment via **Guardrails + controls** in the Foundry portal. The configuration wizard has **4 pages.**
+A **guardrail** (formerly content filter) is a set of **controls**, assigned per deployment under **Build → Guardrails** in the Foundry portal. Each control has a **risk**, **intervention points**, and an **action** (annotate or block).
 
-**Pages 1 & 2 — Input filters and Output filters**
+**Content harm controls — user input and output**
 
 Applied to user prompts (input) and model completions (output) separately:
 
-| Category        | Configurable threshold (block at or above) |
-| --------------- | ------------------------------------------ |
-| Hate & fairness | Low / **Medium** / High                    |
-| Sexual          | Low / **Medium** / High                    |
-| Violence        | Low / **Medium** / High                    |
-| Self-harm       | Low / **Medium** / High                    |
+| Category        | Configurable blocking level |
+| --------------- | --------------------------- |
+| Hate & fairness | Low / **Medium** / High     |
+| Sexual          | Low / **Medium** / High     |
+| Violence        | Low / **Medium** / High     |
+| Self-harm       | Low / **Medium** / High     |
 
-**Default:** block Medium and above — content at Low or Safe passes through
+**Default:** blocking level Medium blocks medium and high severity — content at Low or Safe passes through
 
 ---
 
@@ -1186,21 +1195,21 @@ Applied to user prompts (input) and model completions (output) separately:
 
 **_[EXAM]_**
 
-**Page 3 — Prompt Shields** (input)
+**Prompt Shields** (input)
 
 | Type                 | Default | Purpose                                                                           |
 | -------------------- | ------- | --------------------------------------------------------------------------------- |
-| Direct attacks       | On      | Detect jailbreak attempts targeting the system prompt                             |
-| **Indirect attacks** | Off     | Detect malicious instructions embedded in **documents or images** the model reads |
+| User prompt attacks  | On      | Detect jailbreak attempts targeting the system prompt                             |
+| **Indirect attacks** | Off     | Detect malicious instructions embedded in **documents** and other external text   |
 
-**Indirect attack** = Cross-Domain Prompt Injection: an attacker hides instructions inside content your agent processes (e.g., text in an image, a malicious PDF). Enable this when agents use RAG, File Search, or vision inputs.
+**Indirect attack** = Cross-Domain Prompt Injection: an attacker hides instructions inside content your agent processes (e.g., a malicious PDF, text extracted from an image). Enable this when agents use RAG, File Search, or OCR text from images.
 
-**Page 4 — Protected material** (output)
+**Protected material** (output)
 
-| Type | Default | Purpose                                           |
-| ---- | ------- | ------------------------------------------------- |
-| Text | On      | Block known copyrighted content (lyrics, recipes) |
-| Code | On      | Block/cite public code (GitHub Copilot–powered)   |
+| Type | Default | Purpose                                             |
+| ---- | ------- | --------------------------------------------------- |
+| Text | On      | Block known copyrighted content (lyrics, recipes)   |
+| Code | On      | Detect code that matches public GitHub repositories |
 
 ---
 
@@ -1222,7 +1231,7 @@ Moderating only user input and final output leaves the **tool call** and **tool 
 | ------------------------------ | ------------------------------------------------------------------------- |
 | Direct user message            | **User prompt shield**                                                    |
 | Text extracted from a document | **Document prompt shield** (indirect attacks)                             |
-| Uploaded image                 | Image-specific inspection — user and document shields do **not** cover it |
+| Uploaded image                 | Extract its text with OCR, then use the **document prompt shield**        |
 
 **Traps:** image moderation detects harmful _visuals_, not hidden instructions. Protected-material detection flags copyrighted content, not injection.
 
@@ -1230,21 +1239,21 @@ Moderating only user input and final output leaves the **tool call** and **tool 
 
 <!-- _class: fit-24 -->
 
-## Thresholds and Spotlighting
+## Blocking Levels and Spotlighting
 
 **_[EXAM]_**
 
-**Threshold direction is counter-intuitive:**
+**A blocking level names the strictness, not the severity it blocks:**
 
 ```text
-  Low     blocks Low + Medium + High   ◀━ most restrictive, most rejections
+  Low     blocks High only             ◀━ least restrictive
   Medium  blocks Medium + High         ◀━ default
-  High    blocks High only             ◀━ least restrictive
+  High    blocks Low + Medium + High   ◀━ most restrictive, most rejections
 ```
 
-Lowering a filter to **Low** _increases_ rejections — it never loosens anything. **Protected material** is a text match, so it ignores severity thresholds entirely and its result is the same at every threshold.
+Raising a control to **High** _increases_ rejections — it also blocks low-severity content (formerly a severity threshold, where Low was the strictest). **Protected material** is a text match, so it ignores blocking levels entirely and its result is the same at every level.
 
-**Spotlighting** marks external content (OCR text, retrieved documents) as untrusted **data**, so the model does not follow instructions found inside it.
+**Spotlighting** (preview, Chat Completions API only) marks external content (OCR text, retrieved documents) as untrusted **data**, so the model does not follow instructions found inside it.
 
 | Requirement                              | Setting                    |
 | ---------------------------------------- | -------------------------- |
@@ -1252,6 +1261,14 @@ Lowering a filter to **Low** _increases_ rejections — it never loosens anythin
 | Lower the model's trust in external text | Enable **spotlighting**    |
 
 Both are needed: shields without spotlighting do not lower trust; spotlighting without Block does not stop the attack.
+
+---
+
+<!-- _class: fit-28 -->
+
+## Retrieval Practice — Lab 5
+
+Pause here and complete [Lab 5](../lab/lab%205/lab.md), then check its [solution](../lab/lab%205/solution.md).
 
 ---
 
@@ -1272,196 +1289,11 @@ Both are needed: shields without spotlighting do not lower trust; spotlighting w
 
 ---
 
-<!-- _class: fit-16 -->
-
-## Rate Limits and 429 Errors
-
-**_[EXAM]_**
-
-**Units:** TPM (Tokens Per Minute) and RPM (Requests Per Minute) — per deployment
-
-**Why you get 429 even when usage looks low:**
-
-- `max_tokens` is counted in the rate limit estimate upfront, not actual tokens generated
-- RPM window is 1–10 seconds — a burst triggers it even if per-minute total is fine
-
-**Response headers (always present):**
-
-| Header                           | When present   | Meaning                   |
-| -------------------------------- | -------------- | ------------------------- |
-| `x-ratelimit-remaining-requests` | Every response | Remaining RPM budget      |
-| `x-ratelimit-remaining-tokens`   | Every response | Remaining TPM budget      |
-| `retry-after-ms`                 | 429 only       | Wait time in milliseconds |
-
-**SDK built-in retry:** `AzureOpenAI(max_retries=5)` — default is 2; exponential backoff + `retry-after` header
-
-**Retry strategy:** **exponential backoff with jitter**. Immediate retries hit the same limit; identical backoff across clients re-synchronizes them into a new burst.
-
-**HTTP 400 — request too large:** move the bulk content into files and retrieve it with `file_search` instead of inlining it in the prompt.
-
-**Best practices:**
-
-- Set `max_tokens` to the **minimum that still produces complete answers** — over-setting wastes rate limit budget without improving quality (model stops naturally when done)
-- Spread requests evenly — avoid sending all requests in the same 1-second window
-- Distribute load across multiple deployments or regions
-- Use **Provisioned (PTU)** deployments for stress testing — reserved throughput, no token-based rate limits
-
----
-
 <!-- _class: fit-28 -->
-
-## Retrieval Practice — Lab 5
-
-Pause here and complete [Lab 5](../lab/lab%205/lab.md), then check its [solution](../lab/lab%205/solution.md).
-
----
-
-<!-- _class: fit-16 -->
-
-## Model Lifecycle and Retirement
-
-**_[EXAM]_**
-
-**5 stages:** Preview → GA → Legacy → Deprecated → **Retired**
-
-| Stage          | Description                                                |
-| -------------- | ---------------------------------------------------------- |
-| **Preview**    | Early access; may change; 30-day retirement notice         |
-| **GA**         | Generally available; 18-month lifecycle                    |
-| **Legacy**     | Replaced by newer version; still accessible                |
-| **Deprecated** | Blocked for new customers; existing customers can continue |
-| **Retired**    | **HTTP 410 Gone** — calls fail completely                  |
-
-**Timeline (GA):** At month 12 → Deprecated; at month 18 → Retired  
-**Notifications:** 60 days (GA), 30 days (Preview) — email to subscription owners + Azure Service Health (filter: "Azure OpenAI Service")
-
-**Auto-upgrade:** Standard deployments only — Provisioned must migrate manually
-
-**`versionUpgradeOption` property:**
-
-| Value                            | Behavior                                           |
-| -------------------------------- | -------------------------------------------------- |
-| `OnceCurrentVersionExpired`      | Upgrade only when current version retires (safest) |
-| `OnceNewDefaultVersionAvailable` | Upgrade when any new default version is released   |
-| `NoAutoUpgrade`                  | Never auto-upgrade — deployment dies at retirement |
-
-**API terminology trap:** `lifecycleStatus: "Deprecated"` in REST API = **Retired** (410); `"Deprecating"` = Deprecated (still works)
-
----
-
-<!-- _class: fit-20 -->
-
-## Monitor Your AI Application
-
-**_[EXAM]_**
-
-**Azure Monitor** collects metrics and logs automatically for all AI resources.
-
-**Two data paths:**
-
-| Data                 | Collection    | Where stored                | Action needed  |
-| -------------------- | ------------- | --------------------------- | -------------- |
-| **Platform metrics** | Automatic     | Azure Monitor metrics DB    | None           |
-| **Resource logs**    | Not automatic | Requires diagnostic setting | Create setting |
-| **Activity log**     | Automatic     | Separate store              | None           |
-
-**Dashboards** (Foundry portal → Metrics): HTTP Requests, Tokens-Based Usage, PTU Utilization, Fine-tuning
-
-**Enable resource logs:**
-
-1. Azure portal → your AI resource → **Diagnostic settings** → **Add**
-2. Select log categories → route to **Log Analytics workspace**
-
-**Query logs with KQL:**
-
-```text
-AzureDiagnostics | take 100
-| project TimeGenerated, OperationName, DurationMs, ResultSignature
-
-AzureMetrics | take 100
-| project TimeGenerated, MetricName, Total, Average, UnitName
-```
-
-**Alerts:** metric alerts (token usage thresholds), log alerts (KQL-based), activity log alerts (resource changes)
-
-**Application Insights:** use for application-layer tracing, custom events, request/dependency tracking
-
----
-
-<!-- _class: fit-24 -->
 
 ## Retrieval Practice — Lab 6
 
-Pause here and complete [Lab 6](../lab/lab%206/lab.md), then check its solution.
-
----
-
-<!-- _class: fit-24 -->
-
-## Which Signal Answers Which Question
-
-**_[EXAM]_**
-
-| Symptom                      | Signal to read                                                     |
-| ---------------------------- | ------------------------------------------------------------------ |
-| Service-side outage          | **Model Availability Rate**                                        |
-| HTTP 429 under load          | Model Availability Rate **and Provisioned Utilization** (capacity) |
-| Unexplained cost spike       | **Token usage** — input and output size drives the bill            |
-| Low-quality or wrong answers | **`RequestResponse`** diagnostic logs                              |
-| Ordered calls inside one run | **Tracing**                                                        |
-
-**Diagnostic log categories:**
-
-| Category              | Contains                                             |
-| --------------------- | ---------------------------------------------------- |
-| **`RequestResponse`** | Full request payloads, status codes, and completions |
-| `Audit`               | Access events only                                   |
-| `Trace`               | Internal service operations only                     |
-
-**Traps:** latency measures time, run success rate measures completion, evaluation metrics measure quality — none of them explain cost.
-
----
-
-<!-- _class: fit-24 -->
-
-## Tracing Configuration
-
-**_[EXAM]_**
-
-Instrument with **OpenTelemetry**, collect and analyze in **Application Insights**. A Log Analytics workspace stores logs but does not instrument the app.
-
-| Requirement                                  | Setting                                         |
-| -------------------------------------------- | ----------------------------------------------- |
-| Keep each service separate in the trace view | A distinct **`OTEL_SERVICE_NAME`** per service  |
-| Keep prompts and completions out of spans    | **`enable_content_recording=False`**            |
-| Audit nested operations                      | **Hierarchical spans** — not flat log entries   |
-| Audit tool invocations                       | **Tool-call attributes** — not generic messages |
-
-**For an agent:** enable **Application Insights for the agent** in the Foundry project. Updating the agent version, restarting it, or attaching a Log Analytics workspace alone sends no telemetry.
-
----
-
-<!-- _class: fit-20 -->
-
-## Security Posture — Defender for Cloud and Sentinel
-
-**Azure Monitor / App Insights** → _performance & cost_ signals (latency, tokens, errors)
-**Microsoft Defender for Cloud + Microsoft Sentinel** → _security & threat_ signals for the AI workload
-
-| Service                               | Role for AI workloads                                                                                                       |
-| ------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| **Defender for Cloud — AI workloads** | Threat detection on Azure OpenAI / Foundry: prompt-injection alerts, data-leak detection, anomalous access on the resource  |
-| **Defender for Cloud — secure score** | Continuous configuration assessment: keyless auth, private endpoints, diagnostic settings on                                |
-| **Microsoft Sentinel** (SIEM/SOAR)    | Aggregates Defender alerts + diagnostic logs across resources; correlation rules; automated playbooks for incident response |
-
-**Wiring it up:**
-
-1. Enable **Diagnostic settings** on the AI resource → Log Analytics workspace
-2. Onboard the workspace to **Microsoft Sentinel**
-3. Enable the **Defender for Cloud** AI workloads plan on the subscription
-4. Sentinel ingests Defender alerts + `AzureDiagnostics` logs → unified detection across model abuse, key misuse, exfiltration
-
-**Exam framing:** “health of the system or the data” in a security sense → Defender for Cloud (resource posture) and Sentinel (SIEM correlation), not Azure Monitor.
+Pause here and complete [Lab 6](../lab/lab%206/lab.md), then check its [solution](../lab/lab%206/solution.md).
 
 ---
 
@@ -1470,58 +1302,6 @@ Instrument with **OpenTelemetry**, collect and analyze in **Application Insights
 # Operate and Secure AI Solutions
 
 The production concerns that complete a generative AI application.
-
----
-
-<!-- _class: fit-28 -->
-
-## Identity, Network, Capacity, Delivery, Oversight
-
-**Production AI must answer five questions:**
-
-- **Who:** Entra ID, managed identity, and RBAC
-- **From where:** private endpoints and network rules
-- **How much:** RPM, TPM, PTU, concurrency, and token cost
-- **How does change ship:** source control, evaluation, promotion, and rollback
-- **What happened:** metrics, traces, evaluation, provenance, and audit
-
-Keyless authentication still requires the correct role assignment. Private networking controls reachability, not authorization.
-
----
-
-<!-- _class: fit-28 -->
-
-## Production Observability and Governance
-
-**Resource logs require a diagnostic setting** before they reach Log Analytics. Monitor application, model, and AI-quality signals together:
-
-- Requests, dependencies, failures, latency, and user feedback
-- Tokens, throughput, model versions, rate limits, and retries
-- Groundedness, relevance, fluency, safety, and refusal rates
-
-Use phased delivery, approval controls, provenance, incident response, and rollback for accountable operation.
-
----
-
-<!-- _class: fit-20 -->
-
-## Key Takeaways
-
-1. **Foundry resource → Projects** (not Hub); use project endpoint for Foundry SDK, Azure OpenAI endpoint for OpenAI SDK
-2. **1,900+ models** — 9 deployment types; use Global Standard by default
-3. **Responses API** recommended for new development; ChatCompletions for portability
-4. **Tools:** `code_interpreter`, `web_search_preview`, `file_search`, `function` — model decides when to call
-5. **Optimization sequence:** Prompt engineering → RAG → Fine-tuning
-6. **Fine-tuning techniques:** LoRA; types: SFT, RFT, DPO
-7. **Responsible AI:** six principles (Transparency answers "how is my data used?"); Map → Measure → Mitigate (4 layers) → Manage
-8. **Moderate four points:** user input, output, tool call, tool response; **Low threshold = most restrictive**; spotlighting + Block for injected instructions
-9. **Incomplete output:** fix with a retry/reflection evaluation, not with temperature
-10. **Rate limits:** TPM + RPM per deployment; retry with **exponential backoff + jitter**; set `max_tokens` to minimum needed
-11. **Model retirement:** Retired = **HTTP 410**; Standard auto-upgrades; Provisioned must migrate manually
-12. **Monitor:** platform metrics auto-collected; **`RequestResponse`** logs need a diagnostic setting; Provisioned Utilization explains 429
-13. **Tracing:** OpenTelemetry + Application Insights; distinct `OTEL_SERVICE_NAME` per service; `enable_content_recording=False`
-14. **RAG groundedness gate:** verify retrieved context is sufficient before generating — LLM gate (pre) or `GroundednessEvaluator` (post)
-15. **Cross-session history:** `previous_response_id` resets per session — persist messages array externally (Cosmos DB, Redis)
 
 ---
 
@@ -1553,7 +1333,7 @@ The demo was approved on Friday. On Monday it is real software.
   5  WHAT actually happened?   oversight   metrics, traces, evaluation, audit
 ```
 
-The rest of this presentation is one section per question.
+The rest of this section takes the five questions in order.
 
 **Exam habit:** when a question describes a production failure, first decide _which of the five_ it belongs to. That usually eliminates three of the four answers.
 
@@ -1584,7 +1364,7 @@ The rest of this presentation is one section per question.
 
 | Least-privilege role               | Grants                                      |
 | ---------------------------------- | ------------------------------------------- |
-| **Cognitive Services OpenAI User** | Call model inference                        |
+| **Foundry User**                   | Call models on a Foundry resource           |
 | **Key Vault Secrets User**         | Read secrets — not Administrator            |
 | **Storage Blob Data Reader**       | Read blobs — not Contributor (write/delete) |
 
@@ -1637,7 +1417,7 @@ A key is something you _have_. An identity is something you _are_ — and Azure 
 
 ## Retrieval Practice — Lab 7
 
-Pause here and complete [Lab 7](../lab/lab%207/lab.md), then check its solution.
+Pause here and complete [Lab 7](../lab/lab%207/lab.md), then check its [solution](../lab/lab%207/solution.md).
 
 ---
 
@@ -1652,16 +1432,16 @@ Capacity is not one number. Three separate limits can each stop you.
 ```text
   RPM  requests per minute   how OFTEN you may call     burst of calls ━▶ 429
   TPM  tokens per minute     how MUCH text per minute   long prompts   ━▶ 429
-  PTU  provisioned units     capacity you RESERVED      no token limit, fixed bill
+  PTU  provisioned units     capacity you RESERVED      utilization cap, fixed bill
 ```
 
 **A token is roughly four characters.** A 2-page prompt is ~1,000 tokens, so 60 such calls a minute costs 60,000 TPM — even though it is only 60 requests.
 
-**Trap:** your requested `max_tokens` is reserved up front. Asking for 4,000 output tokens spends 4,000 of your TPM budget even when the model replies with one word.
+**Trap:** `max_output_tokens` is a cap, not a reservation. TPM counts the tokens actually sent and generated — asking for 4,000 output tokens costs nothing extra when the model replies with one word.
 
 ---
 
-<!-- _class: fit-24 -->
+<!-- _class: fit-20 -->
 
 ## Capacity Dimensions and Levers
 
@@ -1670,7 +1450,7 @@ Capacity is not one number. Three separate limits can each stop you.
 | Concern           | What to monitor or choose                                 |
 | ----------------- | --------------------------------------------------------- |
 | RPM               | Requests per minute; bursts can cause 429 responses       |
-| TPM               | Tokens per minute; input plus reserved output budget      |
+| TPM               | Tokens per minute; input plus generated output tokens     |
 | PTU               | Reserved throughput for predictable high-volume workloads |
 | Concurrent jobs   | Service-specific limits, such as video generation         |
 | Regional capacity | Availability and failover options                         |
@@ -1688,11 +1468,47 @@ Capacity is not one number. Three separate limits can each stop you.
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-24 -->
 
-## Retrieval Practice — Lab 8
+## Rate Limits and 429 Errors
 
-Pause here and complete [Lab 8](../lab/lab%208/lab.md) before continuing.
+**_[EXAM]_**
+
+**Units:** TPM (Tokens Per Minute) and RPM (Requests Per Minute) — per deployment
+
+**Why you get 429 even when usage looks low:**
+
+- Standard deployments share capacity — under heavy demand the service temporarily lowers your effective limit
+- RPM window is 1–10 seconds — a burst triggers it even if per-minute total is fine
+
+**Response headers (always present):**
+
+| Header                           | When present   | Meaning                   |
+| -------------------------------- | -------------- | ------------------------- |
+| `x-ratelimit-remaining-requests` | Every response | Remaining RPM budget      |
+| `x-ratelimit-remaining-tokens`   | Every response | Remaining TPM budget      |
+| `retry-after-ms`                 | 429 only       | Wait time in milliseconds |
+
+**HTTP 400 — request too large:** move the bulk content into files and retrieve it with `file_search` instead of inlining it in the prompt.
+
+---
+
+<!-- _class: fit-24 -->
+
+## Handling 429 — Retry and Best Practices
+
+**_[EXAM]_**
+
+**SDK built-in retry:** `OpenAI(max_retries=5)` — default is 2; exponential backoff + `retry-after` header
+
+**Retry strategy:** **exponential backoff with jitter**. Immediate retries hit the same limit; identical backoff across clients re-synchronizes them into a new burst.
+
+**Best practices:**
+
+- Keep prompts short and output **no longer than the scenario needs** — TPM counts the tokens actually sent and generated, not the configured `max_output_tokens`
+- Spread requests evenly — avoid sending all requests in the same 1-second window
+- Distribute load across multiple deployments or regions
+- Use **Provisioned (PTU)** deployments for stress testing — reserved throughput, throttled on utilization instead of a TPM quota
 
 ---
 
@@ -1711,15 +1527,137 @@ Pause here and complete [Lab 8](../lab/lab%208/lab.md) before continuing.
 
 ---
 
+<!-- _class: fit-16 -->
+
+## Model Lifecycle and Retirement
+
+**_[EXAM]_**
+
+**5 stages:** Preview → GA → Legacy → Deprecated → **Retired**
+
+| Stage          | Description                                                |
+| -------------- | ---------------------------------------------------------- |
+| **Preview**    | Early access; may change; 30-day retirement notice         |
+| **GA**         | Generally available; 18-month lifecycle                    |
+| **Legacy**     | Replaced by newer version; still accessible                |
+| **Deprecated** | Blocked for new customers; existing customers can continue |
+| **Retired**    | **HTTP 410 Gone** — calls fail completely                  |
+
+**Timeline (GA):** At month 12 → Deprecated; at month 18 → Retired  
+**Notifications:** 60 days (GA), 30 days (Preview) — email to subscription owners + Azure Service Health (filter: "Azure OpenAI Service")
+
+**Auto-upgrade:** Global Standard, Data Zone Standard, and Standard only — Provisioned must migrate manually
+
+**`versionUpgradeOption` property:**
+
+| Value                            | Behavior                                           |
+| -------------------------------- | -------------------------------------------------- |
+| `OnceCurrentVersionExpired`      | Upgrade only when current version retires (safest) |
+| `OnceNewDefaultVersionAvailable` | Upgrade when any new default version is released   |
+| `NoAutoUpgrade`                  | Never auto-upgrade — deployment dies at retirement |
+
+**API terminology trap:** `lifecycleStatus: "Deprecated"` in REST API = **Retired** (410); `"Deprecating"` = Deprecated (still works)
+
+---
+
 <!-- _class: fit-28 -->
 
-## Retrieval Practice — Lab 9
+## Retrieval Practice — Lab 8
 
-Pause here and complete [Lab 9](../lab/lab%209/lab.md), then check its solution.
+Pause here and complete [Lab 8](../lab/lab%208/lab.md), then check its [solution](../lab/lab%208/solution.md).
 
 ---
 
 <!-- _class: fit-24 -->
+
+## Monitor Your AI Application
+
+**_[EXAM]_**
+
+**Azure Monitor** collects metrics and logs automatically for all AI resources.
+
+**Two data paths:**
+
+| Data                 | Collection    | Where stored                | Action needed  |
+| -------------------- | ------------- | --------------------------- | -------------- |
+| **Platform metrics** | Automatic     | Azure Monitor metrics DB    | None           |
+| **Resource logs**    | Not automatic | Requires diagnostic setting | Create setting |
+| **Activity log**     | Automatic     | Separate store              | None           |
+
+**Dashboards** (Foundry portal → Metrics): HTTP Requests, Tokens-Based Usage, PTU Utilization, Fine-tuning
+
+**Application Insights:** use for application-layer tracing, custom events, request/dependency tracking
+
+---
+
+<!-- _class: fit-24 -->
+
+## Resource Logs, KQL, and Alerts
+
+**_[EXAM]_**
+
+**Enable resource logs:**
+
+1. Azure portal → your AI resource → **Diagnostic settings** → **Add**
+2. Select log categories → route to **Log Analytics workspace**
+
+**Query logs with KQL:**
+
+```text
+AzureDiagnostics | take 100
+| project TimeGenerated, OperationName, DurationMs, ResultSignature
+
+AzureMetrics | take 100
+| project TimeGenerated, MetricName, Total, Average, UnitName
+```
+
+**Alerts:** metric alerts (token usage thresholds), log alerts (KQL-based), activity log alerts (resource changes)
+
+---
+
+<!-- _class: fit-20 -->
+
+## Which Signal Answers Which Question
+
+**_[EXAM]_**
+
+| Symptom                      | Signal to read                                                     |
+| ---------------------------- | ------------------------------------------------------------------ |
+| Service-side outage          | **Azure OpenAI AvailabilityRate**                                  |
+| HTTP 429 under load          | AvailabilityRate **and Provisioned-managed Utilization V2**        |
+| Unexplained cost spike       | **Processed Prompt Tokens** and **Generated Completion Tokens**    |
+| Low-quality or wrong answers | **`RequestResponse`** diagnostic logs                              |
+| Ordered calls inside one run | **Tracing**                                                        |
+
+**Diagnostic log categories:**
+
+**`RequestResponse`** holds the request payloads, status codes, and completions. The other two categories are `Audit` and `Trace`.
+
+**Traps:** latency measures time, run success rate measures completion, evaluation metrics measure quality — none of them explain cost.
+
+---
+
+<!-- _class: fit-24 -->
+
+## Tracing Configuration
+
+**_[EXAM]_**
+
+Instrument with **OpenTelemetry**, collect and analyze in **Application Insights**. A Log Analytics workspace stores logs but does not instrument the app.
+
+| Requirement                                  | Setting                                         |
+| -------------------------------------------- | ----------------------------------------------- |
+| Keep each service separate in the trace view | A distinct **`OTEL_SERVICE_NAME`** per service  |
+| Keep prompts and completions out of spans    | **`enable_content_recording=False`**            |
+| Audit nested operations                      | **Hierarchical spans** — not flat log entries   |
+| Audit tool invocations                       | **Tool-call attributes** — not generic messages |
+| Trace your own client code (preview)         | **`AIProjectInstrumentor().instrument()`**      |
+
+**For an agent:** enable **Application Insights for the agent** in the Foundry project. Updating the agent version, restarting it, or attaching a Log Analytics workspace alone sends no telemetry.
+
+---
+
+<!-- _class: fit-20 -->
 
 ## Observability and Evaluation in Production
 
@@ -1730,7 +1668,7 @@ Pause here and complete [Lab 9](../lab/lab%209/lab.md), then check its solution.
 | Level       | Signals                                                           |
 | ----------- | ----------------------------------------------------------------- |
 | Application | Requests, failures, dependencies, user feedback                   |
-| Model       | Tokens, latency, throughput, model version, rate limits           |
+| Model       | Tokens, latency, throughput, model version, rate limits, retries  |
 | AI quality  | Groundedness, relevance, coherence, fluency, safety, refusal rate |
 
 **Tracing should connect:** user request → prompt → model response → retrieval → tool calls → final answer.
@@ -1749,9 +1687,33 @@ Use evaluation datasets and alerts to detect regression before changing producti
 
 <!-- _class: fit-28 -->
 
-## Retrieval Practice — Lab 10
+## Retrieval Practice — Lab 9
 
-Pause here and complete [Lab 10](../lab/lab%2010/lab.md), then check its solution.
+Pause here and complete [Lab 9](../lab/lab%209/lab.md), then check its [solution](../lab/lab%209/solution.md).
+
+---
+
+<!-- _class: fit-18 -->
+
+## Security Posture — Defender for Cloud and Sentinel
+
+**Azure Monitor / App Insights** → _performance & cost_ signals (latency, tokens, errors)
+**Microsoft Defender for Cloud + Microsoft Sentinel** → _security & threat_ signals for the AI workload
+
+| Service                               | Role for AI workloads                                                                                                       |
+| ------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| **Defender for Cloud — AI services**  | Threat detection on Azure OpenAI / Foundry: prompt-injection alerts, data-leak detection, anomalous access on the resource  |
+| **Defender for Cloud — secure score** | Continuous configuration assessment: keyless auth, private endpoints, diagnostic settings on                                |
+| **Microsoft Sentinel** (SIEM/SOAR)    | Aggregates Defender alerts + diagnostic logs across resources; correlation rules; automated playbooks for incident response |
+
+**Wiring it up:**
+
+1. Enable **Diagnostic settings** on the AI resource → Log Analytics workspace
+2. Onboard the workspace to **Microsoft Sentinel**
+3. Enable the **Defender for AI Services** plan in Defender for Cloud on the subscription
+4. Sentinel ingests Defender alerts + `AzureDiagnostics` logs → unified detection across model abuse, key misuse, exfiltration
+
+**Exam framing:** “health of the system or the data” in a security sense → Defender for Cloud (resource posture) and Sentinel (SIEM correlation), not Azure Monitor.
 
 ---
 
@@ -1779,15 +1741,37 @@ Pause here and complete [Lab 10](../lab/lab%2010/lab.md), then check its solutio
 
 <!-- _class: fit-28 -->
 
+## Retrieval Practice — Lab 10
+
+Pause here and complete [Lab 10](../lab/lab%2010/lab.md), then check its [solution](../lab/lab%2010/solution.md).
+
+---
+
+<!-- _class: fit-16 -->
+
 ## Key Takeaways
 
-1. **Identity:** prefer Entra ID and managed identity; keyless still requires RBAC
-2. **Network:** private endpoints and network rules control reachability
-3. **Capacity:** RPM, TPM, PTU, concurrency, region, and token cost are separate concerns
-4. **Delivery:** version AI configuration and promote it through tested environments
-5. **Monitoring:** combine application, model, and AI-quality signals
-6. **Governance:** preserve provenance and require approval for high-impact actions
-7. **MSLearn relationship:** authentication, cost, tracing, and approvals appear indirectly; private networking and the full operational model are exam-oriented gaps
+1. **Foundry resource → Projects**; use project endpoint for Foundry SDK, Azure OpenAI endpoint for OpenAI SDK
+2. **10,000+ models** — 9 deployment types; use Global Standard by default
+3. **Responses API** recommended for new development; ChatCompletions for portability
+4. **Cross-session history:** stored responses behind `previous_response_id` expire (30 days by default) — persist messages array externally (Cosmos DB, Redis)
+5. **Tools:** `code_interpreter`, `web_search`, `file_search`, `function` — model decides when to call
+6. **Optimization sequence:** Prompt engineering → RAG → Fine-tuning
+7. **Fine-tuning techniques:** LoRA; types: SFT, RFT, DPO
+8. **Incomplete output:** fix with a retry/reflection evaluation, not with a parameter
+9. **RAG groundedness gate:** verify retrieved context is sufficient before generating — LLM gate (pre) or `GroundednessEvaluator` (post)
+10. **Responsible AI:** six principles (Transparency answers "how is my data used?"); Map → Measure → Mitigate (4 layers) → Manage
+11. **Moderate four points:** user input, output, tool call, tool response; **High blocking level = most restrictive**; spotlighting + Block for injected instructions
+12. **Identity:** prefer Entra ID and managed identity; keyless still requires RBAC — **Foundry User** on a Foundry resource
+13. **Network:** private endpoints and network rules control reachability
+14. **Capacity:** RPM, TPM, PTU, concurrency, region, and token cost are separate concerns
+15. **Rate limits:** TPM + RPM per deployment; retry with **exponential backoff + jitter**; TPM counts actual tokens, not `max_output_tokens`
+16. **Delivery:** version AI configuration and promote it through tested environments
+17. **Model retirement:** Retired = **HTTP 410**; Standard types auto-upgrade; Provisioned must migrate manually
+18. **Monitoring:** combine application, model, and AI-quality signals
+19. **Monitor:** platform metrics auto-collected; **`RequestResponse`** logs need a diagnostic setting; Provisioned-managed Utilization V2 explains 429
+20. **Tracing:** OpenTelemetry + Application Insights; distinct `OTEL_SERVICE_NAME` per service; `enable_content_recording=False`
+21. **Governance:** preserve provenance and require approval for high-impact actions
 
 ---
 
@@ -1795,27 +1779,23 @@ Pause here and complete [Lab 10](../lab/lab%2010/lab.md), then check its solutio
 
 # Appendix
 
-Relationship to the Microsoft Learn path
+What this lecture adds to the Microsoft Learn path
 
 ---
 
 <!-- _class: fit-20 -->
 
-## Coverage Map
+## What This Lecture Adds to the Microsoft Learn Path
 
-This topic supplements the four core presentations. It does not replace the official Microsoft Learn modules.
+This lecture supplements the official Microsoft Learn modules. It does not replace them.
 
-| Status       | Meaning                                                                     |
-| ------------ | --------------------------------------------------------------------------- |
-| **Direct**   | A dedicated or detailed Microsoft Learn lesson exists                       |
-| **Indirect** | Microsoft Learn mentions the concept, but does not teach the full objective |
-| **Exam gap** | Explicit in the exam objectives, but not developed in the scraped course    |
+| Exam topic                                        | In Microsoft Learn                                        | Added in this lecture                                       |
+| ------------------------------------------------- | --------------------------------------------------------- | ----------------------------------------------------------- |
+| Managed identity and keyless authentication       | Appears in the authentication and agent lessons           | Choice per scenario, how a token is issued, minimal roles   |
+| Private networking and role policies              | Not developed as an architecture topic                    | Private endpoints, network rules, egress, data residency    |
+| Quotas, scaling, and cost footprints              | Model cost, latency, and quota examples                   | RPM, TPM, and PTU, handling HTTP 429, capacity levers       |
+| CI/CD for Foundry projects                        | Only touched on briefly                                   | Versioned assets, environments, evaluation before promotion |
+| Monitoring, tracing, drift, and grounding quality | Evaluation and tracing are introduced, operations lightly | Signal per symptom, log categories, tracing settings, drift |
+| Audit, provenance, approval, and oversight        | Responsible AI and workflow approval, covered separately  | Audit record, provenance, approval controls                 |
 
-| Exam objective                                    | MSLearn status                                                               |
-| ------------------------------------------------- | ---------------------------------------------------------------------------- |
-| Managed identity and keyless authentication       | **Indirect** — appears in authentication and agent lessons                   |
-| Private networking and role policies              | **Exam gap** — not developed as an architecture topic                        |
-| Quotas, scaling, and cost footprints              | **Indirect** — model cost, latency, and quota examples exist                 |
-| CI/CD for Foundry projects                        | **Indirect** — discussed in Microsoft 365 Toolkit material                   |
-| Monitoring, tracing, drift, and grounding quality | **Indirect** — evaluation and tracing are introduced, operations are lighter |
-| Audit, provenance, approval, and oversight        | **Indirect** — responsible AI and workflow approval are covered separately   |
+**Study beyond Microsoft Learn:** authentication, cost, tracing, and approvals are only touched on there; private networking and the full operating model are exam topics that need this lecture or the product documentation.

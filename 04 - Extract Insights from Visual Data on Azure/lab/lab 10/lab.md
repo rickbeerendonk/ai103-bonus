@@ -1,5 +1,5 @@
-# Lab 10 - Search and Privacy
+# Lab 10 - Speech and Workflow
 
-13. What sequence rotates a compromised Search key with minimal downtime?
-14. Which projections fit JSON objects and tabular text?
-15. Which three actions implement group-based document filtering?
+28. What event supports voice-agent barge-in?
+29. What reduces the wait before a real-time response?
+30. Which expression tests that a variable has a value?

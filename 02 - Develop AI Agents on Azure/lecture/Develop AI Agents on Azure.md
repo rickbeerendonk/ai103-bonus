@@ -2,7 +2,7 @@
 marp: true
 # Copyright © 2026 Rick Beerendonk
 theme: oblicum-marp-theme
-footer: "![](../../../marp/glasspaper-logo.svg) ![](../../../marp/oblicum-logo.svg)"
+footer: "![](../../marp/glasspaper-logo.svg) ![](../../marp/oblicum-logo.svg)"
 ---
 
 <!-- _class: lead -->
@@ -18,10 +18,12 @@ footer: "![](../../../marp/glasspaper-logo.svg) ![](../../../marp/oblicum-logo.s
 ## What You'll Learn
 
 - Explain what turns a chat model into an agent
+- Tell conversation state, knowledge, and memory apart
 - Give an agent tools, and decide who is allowed to run them
 - Connect an agent to company knowledge and to Microsoft 365
 - Choose an orchestration shape when one agent is not enough
 - Recognise when to use MCP and when to use A2A
+- Find which part failed when an agent gives a bad answer
 
 ---
 
@@ -43,7 +45,7 @@ The loop is the part people forget. It is the whole trick.
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-24 -->
 
 ## The Agent Loop
 
@@ -70,11 +72,9 @@ The loop is the part people forget. It is the whole trick.
 
 ---
 
-<!-- _class: fit-28 -->
-
 ## Retrieval Practice — Lab 1
 
-Pause here and complete [Lab 1](../lab/lab%201/lab.md) before continuing.
+Pause here and complete [Lab 1](../lab/lab%201/lab.md), then check its [solution](../lab/lab%201/solution.md).
 
 ---
 
@@ -84,7 +84,7 @@ Pause here and complete [Lab 1](../lab/lab%201/lab.md) before continuing.
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-24 -->
 
 ## What is an AI Agent?
 
@@ -96,41 +96,43 @@ Pause here and complete [Lab 1](../lab/lab%201/lab.md) before continuing.
 
 **Agent types in Microsoft Foundry:**
 
-| Type            | Sub-type     | Description                                                |
-| --------------- | ------------ | ---------------------------------------------------------- |
-| **Declarative** | Prompt-based | Model + instructions + tools + prompts (most common)       |
-| **Declarative** | Workflow     | Multi-agent orchestration defined in YAML                  |
-| **Hosted**      | —            | Containerized code-based agents hosted by Foundry platform |
+| Type                         | Description                                                                             |
+| ---------------------------- | --------------------------------------------------------------------------------------- |
+| **Prompt agent**             | Model + instructions + tools, defined by configuration and run by Foundry (most common) |
+| **Voice-based prompt agent** | A prompt agent for real-time spoken conversations                                       |
+| **Hosted agent**             | Your own code in a container, hosted by the Foundry platform                            |
+
+**Not an agent type any more:** workflows built in the portal designer are being retired in favour of the Microsoft Agent Framework.
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-24 -->
 
 ## Agent Service Features
 
-| Feature                    | Description                                           |
-| -------------------------- | ----------------------------------------------------- |
-| **Automatic tool calling** | Agent decides when and how to invoke tools            |
-| **Securely managed data**  | Conversation data managed via Responses API           |
-| **Extensive tool catalog** | Functions, code interpreter, file search, MCP servers |
-| **Enterprise security**    | Keyless auth, content safety integration              |
-| **Customizable storage**   | Platform-managed or bring your own Azure Blob         |
-| **Observability/tracing**  | Built-in trace logging                                |
-| **Model selection**        | Any deployed model                                    |
+| Feature                    | Description                                                                 |
+| -------------------------- | --------------------------------------------------------------------------- |
+| **Automatic tool calling** | Agent decides when and how to invoke tools                                  |
+| **Securely managed data**  | Conversation data managed via Responses API                                 |
+| **Extensive tool catalog** | Functions, code interpreter, file search, web search, MCP servers           |
+| **Enterprise security**    | Microsoft Entra identity, RBAC, content filters                             |
+| **Customizable storage**   | Basic setup: managed by Microsoft; standard setup: your own Azure resources |
+| **Observability/tracing**  | Tracing, metrics, evaluations; Application Insights integration             |
+| **Model selection**        | Models from the Foundry model catalog                                       |
 
 **Required resources:** Foundry project + model deployment  
 **Optional:** Azure AI Search, Azure Storage, Azure Key Vault, Azure Functions
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-24 -->
 
 ## Development Approaches
 
-| Approach                                  | Best for                                  |
-| ----------------------------------------- | ----------------------------------------- |
-| **Foundry portal**                        | No-code visual design, playground testing |
-| **VS Code extension (Microsoft Foundry)** | Code-first, YAML, version control         |
+| Approach                        | Best for                                  |
+| ------------------------------- | ----------------------------------------- |
+| **Foundry portal**              | No-code visual design, playground testing |
+| **Foundry Toolkit for VS Code** | Code-first, YAML, version control         |
 
 **VS Code Agent YAML pattern:**
 
@@ -139,10 +141,7 @@ Pause here and complete [Lab 1](../lab/lab%201/lab.md) before continuing.
 version: 1.0.0
 name: my-agent
 model:
-  id: "gpt-4.1"
-  options:
-    temperature: 0.5
-    top_p: 1
+  id: "gpt-5.2"
 instructions: |
   You are a helpful assistant.
 tools: []
@@ -150,7 +149,7 @@ tools: []
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-20 -->
 
 ## Create Agent via SDK
 
@@ -166,18 +165,217 @@ project_client = AIProjectClient(
 )
 
 agent = project_client.agents.create_version(
-    name="my-agent",
+    agent_name="my-agent",
     definition=PromptAgentDefinition(
-        model="gpt-4.1",
+        model="gpt-5.2",
         instructions="You are a helpful assistant.",
         tools=[],
     )
 )
 
-agent = project_client.agents.get(name="my-agent")   # retrieve an existing agent
+agent = project_client.agents.get(agent_name="my-agent")   # retrieve an existing agent
 ```
 
 **Keyless access:** `DefaultAzureCredential()` plus the **`get`** operation retrieves an existing agent through Entra ID. An API-key credential is not Entra ID, and `create` or `delete` do not return the existing agent.
+
+---
+
+<!-- _class: fit-24 -->
+
+## Generation Controls
+
+**_[EXAM]_**
+
+| Control                                                                                                                   | Main effect                                                         | Exam consideration                                                                                                       |
+| ------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| **Reasoning effort:** `reasoning_effort` (Chat Completions) / `reasoning={"effort": ...}` (Responses API)                 | How much the model thinks before it answers                         | Lower for simple, fast tasks; higher for multi-step problems. More effort means more reasoning tokens, latency, and cost |
+| **Output limit:** `max_output_tokens` (Responses API) / `max_completion_tokens` (Chat Completions), formerly `max_tokens` | Output budget, for reasoning tokens and the visible answer together | Affects completeness and cost                                                                                            |
+
+**Do not use a parameter to solve the wrong problem:** grounding fixes missing knowledge; more reasoning effort does not add facts.
+
+**Reasoning models** are controlled with reasoning effort. With reasoning switched on, `temperature` and `top_p` are rejected.
+
+---
+
+<!-- _class: fit-28 -->
+
+## Generation Controls — Reasoning Effort and Output Limit in Code
+
+**_[EXAM]_**
+
+`gpt-5.2` and `gpt-5-mini` are reasoning models. The values of reasoning effort vary by model and include `none`, `minimal`, `low`, `medium`, and `high`.
+
+```python
+response = client.responses.create(
+    model="gpt-5.2",
+    input="Is it snowing in Oslo, and should I cancel the trip?",
+    reasoning={"effort": "low"},
+    max_output_tokens=500,
+)
+```
+
+**Answer cut short:** the output limit was reached. The Responses API returns `status: "incomplete"` with reason `max_output_tokens`; Chat Completions returns finish reason `length`. Raise the limit; it must hold the reasoning tokens as well as the answer.
+
+---
+
+## Retrieval Practice — Lab 2
+
+Pause here and complete [Lab 2](../lab/lab%202/lab.md), then check its [solution](../lab/lab%202/solution.md).
+
+---
+
+<!-- _class: lead -->
+
+# Conversations, Responses, and Memory
+
+---
+
+<!-- _class: fit-28 -->
+
+## Agent Lifecycle and Runtime State
+
+**_[EXAM]_**
+
+**Agent:** instructions, model, and tools
+
+**Conversation:** persistent history across turns
+
+**Item:** a message, tool call, or tool output in the conversation
+
+**Response:** one execution against the conversation; it produces output items
+
+Use a durable conversation or persisted message store when history must survive sessions.
+
+**To keep a full case history across sessions, store the conversation ID and reuse it.** Saving only the final model response loses the tool calls and tool outputs; summarizing condenses history instead of restoring the complete execution record.
+
+---
+
+<!-- _class: fit-28 -->
+
+## Agent Service Lifecycle — Conversation and Response
+
+**_[EXAM]_**
+
+For the exam, distinguish the persistent conversation from one execution:
+
+```text
+Agent         = instructions + model + tools
+Conversation  = persistent history of items
+Item          = message, tool call, or tool output in a conversation
+Response      = one execution of an agent against a conversation
+```
+
+**Why it matters:** a conversation stores context, while a response represents the model and tool execution that produces the next output.
+
+**Classic API:** threads and runs are the names of conversations and responses in the classic API.
+
+---
+
+<!-- _class: fit-28 -->
+
+## Lifecycle in Code — Agent, Conversation, Response
+
+**_[EXAM]_**
+
+**Typical flow:** create the agent once, open a conversation, then ask for a response.
+
+```python
+agent = project_client.agents.create_version(
+    agent_name="my-agent",
+    definition=PromptAgentDefinition(model="gpt-5.2", instructions="You are a helpful assistant."),
+)
+
+conversation = openai_client.conversations.create()
+
+response = openai_client.responses.create(
+    conversation=conversation.id,
+    input="Compare Q1 and Q2 revenue",
+    extra_body={"agent_reference": {"name": agent.name, "type": "agent_reference"}},
+)
+print(response.output_text)
+```
+
+A second `responses.create()` with the same `conversation.id` continues the same history.
+
+---
+
+<!-- _class: fit-28 -->
+
+## Conversation vs Response — the Whiteboard and the Meeting
+
+```text
+  CONVERSATION  (the whiteboard — stays on the wall)
+    ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+    ┃ item 1  user      "Compare Q1 and Q2 revenue"           ┃
+    ┃ item 2  assistant "Q1 was 4.2M, Q2 was 5.1M"            ┃
+    ┃ item 3  user      "Now chart it"                        ┃
+    ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+      ▲                                ▲
+      ┃                                ┃
+      RESPONSE #1                      RESPONSE #2
+   (a meeting: reads the whole board, may call tools,
+    writes the next items, then ends)
+```
+
+**The conversation persists; a response is over as soon as it produces its output.** Cost, latency, tool calls, and failures all belong to a _response_. Context belongs to the _conversation_.
+
+---
+
+<!-- _class: fit-24 -->
+
+## Agent Memory and Scopes
+
+**_[EXAM]_**
+
+**Memory is not RAG and not conversation history.**
+
+| Feature          | Stores                                              |
+| ---------------- | --------------------------------------------------- |
+| **Conversation** | The full turn history of one ongoing case           |
+| **Knowledge**    | Source documents retrieved as evidence              |
+| **Memory**       | Facts and preferences reused in _new_ conversations |
+
+**`scope` is a partition key. It decides who shares a memory:**
+
+| `scope` value                            | Who shares the memory                                                                |
+| ---------------------------------------- | ------------------------------------------------------------------------------------ |
+| `"{{$userId}}"`                          | One signed-in user, across conversations — no ID in code                             |
+| A static value, such as `"support-team"` | Everyone who uses that value — it leaks between users when the memories are personal |
+
+**Lifetime:** a default time to live (TTL) on the memory store decides how long memories are kept. The scope does not.
+
+---
+
+<!-- _class: fit-22 -->
+
+## Memory Scope in Code — `{{$userId}}`
+
+**_[EXAM]_**
+
+Attach the memory tool with a scope. Use the placeholder, not a user ID that you build yourself.
+
+```python
+memory_tool = MemorySearchPreviewTool(
+    memory_store_name="support_memory",
+    scope="{{$userId}}",
+    update_delay=300,
+)
+
+agent = project_client.agents.create_version(
+    agent_name="support-agent",
+    definition=PromptAgentDefinition(model="gpt-5.2", tools=[memory_tool]),
+)
+```
+
+The `{{$userId}}` placeholder is substituted at runtime, so each user is isolated without generating identifiers yourself. The value comes from the `x-memory-user-id` request header or, without it, from the caller's Microsoft Entra identity.
+
+**Before this works:** create the memory store (`memory_store_name`) with a chat model and an embedding model. `update_delay` is the number of seconds without activity before memories are written.
+
+---
+
+## Retrieval Practice — Lab 3
+
+Pause here and complete [Lab 3](../lab/lab%203/lab.md), then check its [solution](../lab/lab%203/solution.md).
 
 ---
 
@@ -187,16 +385,20 @@ agent = project_client.agents.get(name="my-agent")   # retrieve an existing agen
 
 ---
 
+<!-- _class: fit-28 -->
+
 ## Custom Tool Options
 
 **_[EXAM]_**
 
-| Option                                 | Description                                            |
-| -------------------------------------- | ------------------------------------------------------ |
-| **Custom function** (function calling) | Describe structure; agent decides when to invoke       |
-| **Azure Functions**                    | Event-driven via queue triggers; input/output bindings |
-| **OpenAPI specification**              | Connect to any HTTP API via OpenAPI 3.0 spec           |
-| **Azure Logic Apps**                   | Low-code/no-code workflow integration                  |
+| Option                                 | Description                                                       |
+| -------------------------------------- | ----------------------------------------------------------------- |
+| **Custom function** (function calling) | Describe structure; agent decides when to invoke                  |
+| **Azure Functions**                    | Event-driven via queue triggers; input/output bindings            |
+| **OpenAPI specification**              | Connect to any HTTP API via an OpenAPI 3.0 or 3.1 spec            |
+| **MCP server**                         | Tools published by a server and shared by many agents (next part) |
+
+**Azure Logic Apps:** the low-code action is documented only for classic agents, which retire on 31 March 2027.
 
 ---
 
@@ -220,22 +422,30 @@ function_tool = FunctionTool(
     description="Get recent snowfall totals for a given location.",
     strict=True,
 )
-
-agent = project_client.agents.create_version(
-    name="snowfall-agent",
-    definition=PromptAgentDefinition(
-        model="gpt-4.1",
-        instructions="Help users find snowfall data.",
-        tools=[function_tool],
-    )
-)
 ```
 
 **`strict=True`** enforces the parameter schema
 
 ---
 
-<!-- _class: fit-20 -->
+## Function Calling — Attach the Tool
+
+Pass the tool in the `tools` list of the agent definition. The model then decides when to call it.
+
+```python
+agent = project_client.agents.create_version(
+    agent_name="snowfall-agent",
+    definition=PromptAgentDefinition(
+        model="gpt-5.2",
+        instructions="Help users find snowfall data.",
+        tools=[function_tool],
+    )
+)
+```
+
+---
+
+<!-- _class: fit-16 -->
 
 ## Azure Functions Tool
 
@@ -274,7 +484,7 @@ tool = AzureFunctionTool(
 
 ## OpenAPI Tool
 
-**Supports OpenAPI 3.0 only**
+**Supports OpenAPI 3.0 and 3.1.** Each operation needs an `operationId`.
 
 ```python
 from azure.ai.projects.models import OpenApiTool, OpenApiAnonymousAuthDetails
@@ -289,7 +499,7 @@ tool = OpenApiTool(
 )
 ```
 
-**Supported auth types:** `anonymous`, `API key`, `managed identity`
+**Supported auth types:** `anonymous`, `API key`, `managed identity` (the project's managed identity)
 
 ---
 
@@ -302,10 +512,26 @@ tool = OpenApiTool(
 When the API needs a key on every call, declare an **API-key security scheme** in the OpenAPI spec so the platform attaches it automatically:
 
 ```python
-from azure.ai.projects.models import OpenApiConnectionAuthDetails
+from azure.ai.projects.models import (
+    OpenApiProjectConnectionAuthDetails, OpenApiProjectConnectionSecurityScheme
+)
 
-auth = OpenApiConnectionAuthDetails(connection_id=project_connection.id)
+auth = OpenApiProjectConnectionAuthDetails(
+    security_scheme=OpenApiProjectConnectionSecurityScheme(
+        project_connection_id=project_connection.id
+    )
+)
 ```
+
+The key stays in the project connection; the agent definition only refers to it.
+
+---
+
+<!-- _class: fit-28 -->
+
+## OpenAPI Authentication — Which Approach?
+
+**_[EXAM]_**
 
 | Approach                    | Result                                                     |
 | --------------------------- | ---------------------------------------------------------- |
@@ -317,7 +543,7 @@ auth = OpenApiConnectionAuthDetails(connection_id=project_connection.id)
 
 ---
 
-<!-- _class: fit-24 -->
+<!-- _class: fit-22 -->
 
 ## Project Connections — One Credential, Many Agents
 
@@ -368,7 +594,7 @@ auth = OpenApiConnectionAuthDetails(connection_id=project_connection.id)
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-20 -->
 
 ## MCPTool — Remote MCP Servers
 
@@ -383,14 +609,14 @@ mcp_tool = MCPTool(
     server_label="GitHub",
     server_url="https://api.githubcopilot.com/mcp/",
     allowed_tools=["list_repos"],    # optional: restrict accessible tools
-    require_approval="never"         # or "always"
+    require_approval="never",        # or "always"
+    headers={"Authorization": "Bearer {token}"},
 )
-mcp_tool.update_headers({"Authorization": "Bearer {token}"})
 
 agent = project_client.agents.create_version(
-    name="github-agent",
+    agent_name="github-agent",
     definition=PromptAgentDefinition(
-        model="gpt-4.1",
+        model="gpt-5.2",
         instructions="Help with GitHub tasks.",
         tools=[mcp_tool],
     )
@@ -401,7 +627,7 @@ agent = project_client.agents.create_version(
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-24 -->
 
 ## MCP Tool Approval
 
@@ -410,14 +636,26 @@ agent = project_client.agents.create_version(
 **`require_approval="always"`** → agent response contains `mcp_approval_request`
 
 ```python
-# Check for approval request in the response
-if response_item.type == "mcp_approval_request":
-    # Present to user or auto-approve
-    await respond_with_approval(
-        approval_request_id=response_item.id,
-        approve=True
-    )
+# Check for approval requests in the response
+approvals = []
+for item in response.output:
+    if item.type == "mcp_approval_request":
+        # Present to user or auto-approve
+        approvals.append(
+            McpApprovalResponse(
+                type="mcp_approval_response",
+                approval_request_id=item.id,
+                approve=True,
+            )
+        )
+
+# Send the decisions in the same conversation
+response = openai_client.responses.create(conversation=conversation.id, input=approvals)
 ```
+
+---
+
+## MCP vs. Hard-Coded Tools
 
 **Key advantages of MCP vs. hard-coded tools:**
 
@@ -427,15 +665,36 @@ if response_item.type == "mcp_approval_request":
 
 ---
 
-## Retrieval Practice — Lab 2
+## Retrieval Practice — Lab 4
 
-Pause here and complete [Lab 2](../lab/lab%202/lab.md), then check its solution.
+Pause here and complete [Lab 4](../lab/lab%204/lab.md), then check its [solution](../lab/lab%204/solution.md).
 
 ---
 
 <!-- _class: lead -->
 
-# Foundry IQ — Knowledge
+# Choosing and Controlling Tools
+
+---
+
+<!-- _class: fit-22 -->
+
+## Tool Taxonomy
+
+**_[EXAM]_**
+
+| Tool                       | Primary capability                             | Typical control                             |
+| -------------------------- | ---------------------------------------------- | ------------------------------------------- |
+| **Function tool**          | Application-owned operation                    | Your schema, validation, and execution      |
+| **MCP tool**               | Discoverable remote tools                      | Server permissions and approval policy      |
+| **File search**            | Retrieval from uploaded files or vector stores | Vector store and citation controls          |
+| **Code interpreter**       | Sandboxed Python execution                     | Files, timeout, memory, and network limits  |
+| **Web/Bing grounding**     | Current external information                   | Search scope, citations, and source quality |
+| **Azure Function/OpenAPI** | Connect APIs and event-driven logic            | Authentication and API contract             |
+
+**Selection rule:** use the narrowest tool that solves the task, and require approval for actions with external side effects.
+
+---
 
 <!-- _class: fit-24 -->
 
@@ -445,12 +704,20 @@ Pause here and complete [Lab 2](../lab/lab%202/lab.md), then check its solution.
 
 By default the model decides. When an agent sometimes answers **without** calling its knowledge tool, the citations are ungrounded — force the call.
 
-| Value                                    | Behavior                                         |
-| ---------------------------------------- | ------------------------------------------------ |
-| `tool_choice="auto"`                     | Default — the model may skip every tool          |
-| `tool_choice="required"`                 | Must call **at least one** tool before answering |
-| `tool_choice={"type": "bing_grounding"}` | Must call **that specific** tool                 |
-| `tool_choice="none"`                     | May not call any tool                            |
+| Value                                                         | Behavior                                         |
+| ------------------------------------------------------------- | ------------------------------------------------ |
+| `tool_choice="auto"`                                          | Default — the model may skip every tool          |
+| `tool_choice="required"`                                      | Must call **at least one** tool before answering |
+| `tool_choice={"type": "function", "name": "recent_snowfall"}` | Must call **that specific** tool                 |
+| `tool_choice="none"`                                          | May not call any tool                            |
+
+**Required vs specific:** `"required"` guarantees _a_ tool runs; it does not say _which_. To force one tool, name it, as in the third row.
+
+---
+
+## `tool_choice` in a Request
+
+Pass `tool_choice` with the request, next to the tools it applies to.
 
 ```python
 response = client.responses.create(
@@ -461,9 +728,42 @@ response = client.responses.create(
 )
 ```
 
-**Required vs specific:** `"required"` guarantees _a_ tool runs; it does not say _which_. To restrict one run to public web results only, name the tool: `{"type": "bing_grounding"}`. Naming `{"type": "azure_ai-search"}` would instead force the private index.
+With `"required"`, the model cannot answer before at least one of the tools has run.
 
 ---
+
+<!-- _class: fit-24 -->
+
+## Human Approval Contract
+
+**_[EXAM]_**
+
+When a tool call requires approval, the SDK submits a Boolean decision such as `approve=True` or `approve=False` tied to the tool call. The string `"approved"` is not the SDK approval value.
+
+**Two contexts, two contracts.** Both are correct in their own place:
+
+| Context                                                      | What pauses                                   | Approval value                                   |
+| ------------------------------------------------------------ | --------------------------------------------- | ------------------------------------------------ |
+| **SDK tool approval** (`require_approval="always"`)          | One tool call, with an `mcp_approval_request` | Boolean: `approve=True` or `approve=False`       |
+| **Workflow YAML** (`ask_question` step, see Agent Workflows) | The whole workflow, until a person answers    | A workflow variable with the string `"approved"` |
+
+**Exam check:** read which context the question describes before you choose `approve=True` or `"approved"`.
+
+---
+
+## Retrieval Practice — Lab 5
+
+Pause here and complete [Lab 5](../lab/lab%205/lab.md), then check its [solution](../lab/lab%205/solution.md).
+
+---
+
+<!-- _class: lead -->
+
+# Foundry IQ — Knowledge
+
+---
+
+<!-- _class: fit-20 -->
 
 ## What is Foundry IQ?
 
@@ -476,20 +776,77 @@ response = client.responses.create(
 
 **RAG steps:** Retrieve → Augment → Generate
 
-**Supported data sources:**
+**Knowledge sources** are indexed (ingested before query time) or remote (queried live):
 
-| Data Source           | Access type | Best for                          |
-| --------------------- | ----------- | --------------------------------- |
-| Azure AI Search Index | Indexed     | Existing search investment        |
-| Azure Blob Storage    | Direct      | Files (PDF, DOCX, TXT, MD, HTML)  |
-| Web (Bing)            | Real-time   | Public, current information       |
-| SharePoint Remote     | Real-time   | Live SharePoint                   |
-| SharePoint Indexed    | Indexed     | Advanced search, custom analyzers |
-| OneLake               | Direct      | Microsoft Fabric data             |
+| Knowledge source             | Indexed or remote | Best for                          |
+| ---------------------------- | ----------------- | --------------------------------- |
+| Search index                 | Indexed           | Existing search investment        |
+| Azure blob                   | Indexed           | Files in Azure Storage            |
+| OneLake                      | Indexed           | Microsoft Fabric data             |
+| Indexed SharePoint (preview) | Indexed           | Advanced search, custom pipelines |
+| Remote SharePoint (preview)  | Remote            | Live SharePoint                   |
+| Web (Bing)                   | Remote            | Public, current information       |
+
+**Also, all in preview:** Azure SQL, File, Fabric data agent, Fabric ontology, MCP server, Work IQ.
 
 ---
 
 <!-- _class: fit-24 -->
+
+## Connecting an Agent to a Knowledge Base
+
+**_[EXAM]_**
+
+```python
+from azure.ai.projects.models import MCPTool, PromptAgentDefinition
+
+knowledge_tool = MCPTool(
+    server_label="product-docs",
+    server_url=f"{search_endpoint}/knowledgebases/product-documentation/mcp?api-version=2026-08-01-preview",
+    require_approval="never",
+    allowed_tools=["knowledge_base_retrieve"],
+    project_connection_id=project_connection_name,
+)
+
+agent = project_client.agents.create_version(
+    agent_name="product-support-agent",
+    definition=PromptAgentDefinition(
+        model="gpt-5-mini",
+        instructions="Answer product questions. Always cite your sources.",
+        tools=[knowledge_tool]
+    )
+)
+```
+
+The Search credential comes from the **project connection**, not from application code.
+
+---
+
+<!-- _class: fit-32 -->
+
+## Azure AI Search RBAC
+
+**_[EXAM]_**
+
+For read-only agent queries against a shared Azure AI Search service, assign the agent identity the **Search Index Data Reader** role. Managed identities let each agent receive a separate, auditable data-plane permission.
+
+**Role boundaries:**
+
+- **Search Index Data Reader:** query documents in indexes
+- **Search Index Data Contributor:** read and push documents
+- **Search Service Contributor:** manage indexes, indexers, and data sources
+
+Use the narrowest data-plane role that satisfies the agent's task; do not grant service-management permissions to a retrieval-only agent.
+
+---
+
+## Retrieval Practice — Lab 6
+
+Pause here and complete [Lab 6](../lab/lab%206/lab.md), then check its [solution](../lab/lab%206/solution.md).
+
+---
+
+<!-- _class: fit-22 -->
 
 ## Classic RAG vs Agentic RAG
 
@@ -519,32 +876,6 @@ response = client.responses.create(
 
 ---
 
-## Connecting an Agent to a Knowledge Base
-
-**_[EXAM]_**
-
-```python
-from azure.ai.projects.models import MCPTool, PromptAgentDefinition
-
-knowledge_tool = MCPTool(
-    server_label="product-docs",
-    server_url=f"{search_endpoint}/knowledgebases/product-documentation/mcp"
-)
-
-agent = project_client.agents.create_version(
-    agent_name="product-support-agent",
-    definition=PromptAgentDefinition(
-        model="gpt-4o-mini",
-        instructions="Answer product questions. Always cite your sources.",
-        tools=[knowledge_tool]
-    )
-)
-```
-
-The Search credential comes from the **project connection**, not from application code.
-
----
-
 ## Retrieval Instructions Pattern
 
 **Three critical behaviors to specify:**
@@ -555,7 +886,7 @@ CRITICAL RULES:
 - You must ALWAYS search the knowledge base before answering any question
 - You must NEVER answer from your own knowledge or training data
 - Every answer must include citations in this format:
-  【doc_id:search_id†source_name】
+  【message_idx:search_idx†source_name】
 - If the knowledge base doesn't contain the answer, respond with:
   "I don't have that information in my knowledge base."
 """
@@ -563,9 +894,9 @@ CRITICAL RULES:
 
 ---
 
-## Retrieval Practice — Lab 4
+## Retrieval Practice — Lab 7
 
-Pause here and complete [Lab 4](../lab/lab%204/lab.md), then check its solution.
+Pause here and complete [Lab 7](../lab/lab%207/lab.md), then check its [solution](../lab/lab%207/solution.md).
 
 ---
 
@@ -577,42 +908,56 @@ Pause here and complete [Lab 4](../lab/lab%204/lab.md), then check its solution.
 
 <!-- _class: fit-28 -->
 
+## Every Agent Has an Endpoint and an Identity
+
+**_[EXAM]_**
+
+**From the moment an agent is created, it has:**
+
+- A stable endpoint (the URL stays the same across version updates)
+- Its own agent identity in Microsoft Entra ID
+
+**The agent identity starts with no permissions.** Assign Azure RBAC roles to it on each resource its tools use (AI Search, Storage). Foundry assigns none automatically.
+
+**Active version:** "Always use latest" by default, so a new version is served at once. Pin a specific version to protect production.
+
+**Not the same as:** an _Agent Application_ (the earlier publishing model) or a _legacy agent_ (shares the project identity).
+
+---
+
+<!-- _class: fit-24 -->
+
 ## Publishing an Agent to Teams/Copilot
 
 **_[EXAM]_**
 
-**Publishing creates an Agent Application with:**
-
-- Dedicated invocation URL (stable across version updates)
-- Agent identity (distinct Microsoft Entra app registration)
-- Creates Azure Bot Service resource
-- User data isolation
+**Publishing** distributes the agent to Microsoft Teams and Microsoft 365 Copilot. Foundry handles the Teams bot registration and builds the app package.
 
 **Publishing scopes:**
 
-| Scope            | Visibility                   | Requires admin approval |
-| ---------------- | ---------------------------- | ----------------------- |
-| **Shared**       | "Your agents" in Teams       | No — immediate          |
-| **Organization** | "Built by your org" in Teams | Yes                     |
+| Scope                                                   | Visibility                   | Requires admin approval                 |
+| ------------------------------------------------------- | ---------------------------- | --------------------------------------- |
+| **Just you** (formerly Shared)                          | "Your agents" in Teams       | No — immediate                          |
+| **People in your organization** (formerly Organization) | "Built by your org" in Teams | Yes — in the Microsoft 365 admin center |
 
-**Required roles:** Azure AI Project Manager (publish), Azure AI User (invoke)
+**Required roles:** Foundry User on the project (publish), plus the right to create a Bot Service resource in the resource group; Foundry Agent Consumer (only call an agent)
 
 **`Microsoft.BotService`** provider must be registered in the subscription
 
-**Post-publish:** Reassign RBAC to the published agent's new identity for Azure resources (AI Search, Storage) — dev-time permissions do not transfer
+**Permissions:** roles go to the agent identity. There is no "reassign after publishing" step.
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-24 -->
 
 ## Microsoft 365 Publishing Options
 
 **Direct Foundry publishing:**
 
-- Creates an Agent Application with a stable invocation URL
-- Creates an Azure Bot Service resource and Microsoft Entra application
-- Generates a Microsoft 365 publishing package
-- Routes new agent versions through the same public endpoint
+- Publishes the agent's stable endpoint to Teams and Microsoft 365 Copilot
+- Handles the Teams bot registration; Foundry creates the Azure Bot Service resource
+- Generates a Microsoft 365 app package
+- Serves new agent versions through the same endpoint, without republishing
 
 **Other channels:**
 
@@ -627,7 +972,7 @@ Pause here and complete [Lab 4](../lab/lab%204/lab.md), then check its solution.
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-20 -->
 
 ## Access Microsoft 365 Data with Work IQ
 
@@ -646,11 +991,11 @@ Pause here and complete [Lab 4](../lab/lab%204/lab.md), then check its solution.
 
 **Work IQ is different from Foundry IQ:**
 
-|                  | Foundry IQ                              | Work IQ                                  |
-| ---------------- | --------------------------------------- | ---------------------------------------- |
-| **Primary data** | Configured enterprise knowledge sources | Microsoft 365 workplace data             |
-| **Typical use**  | Product, policy, and document knowledge | Personal and organizational work context |
-| **Integration**  | MCP-based knowledge connection          | Microsoft 365 agent integration          |
+|                  | Foundry IQ                              | Work IQ                                               |
+| ---------------- | --------------------------------------- | ----------------------------------------------------- |
+| **Primary data** | Configured enterprise knowledge sources | Microsoft 365 workplace data                          |
+| **Typical use**  | Product, policy, and document knowledge | Personal and organizational work context              |
+| **Integration**  | MCP-based knowledge connection          | Work IQ MCP endpoint; the built-in tool is in preview |
 
 ---
 
@@ -663,16 +1008,16 @@ Pause here and complete [Lab 4](../lab/lab%204/lab.md), then check its solution.
 1. Test normal, ambiguous, and adversarial prompts in the Foundry playground
 2. Verify every configured tool and knowledge source
 3. Check citations, authentication, and user-data isolation
-4. Confirm the published identity has the required Azure RBAC roles
+4. Confirm the agent identity has the required Azure RBAC roles
 
 **After publishing:**
 
 - Test in Teams and Microsoft 365 Copilot with representative users
 - Monitor invocation failures, latency, tool calls, and user feedback
-- Update the agent version without changing the stable invocation URL
-- Reassign permissions whenever a published identity is newly created
+- Update the agent version without changing the stable endpoint; pin the active version when production must not change yet
+- Assign roles to the agent identity of every new agent
 
-**Common failure:** the agent works in Foundry but fails after publishing because development-time permissions do not transfer to the published identity.
+**Common failure:** a tool fails with an authorization error because the agent identity has no role on the resource. A new agent identity starts without permissions.
 
 ---
 
@@ -680,11 +1025,17 @@ Pause here and complete [Lab 4](../lab/lab%204/lab.md), then check its solution.
 
 # Agent Workflows
 
+---
+
+<!-- _class: fit-24 -->
+
 ## Workflow Patterns
 
 **_[EXAM]_**
 
-For a workflow that must pause before an external side effect, use an **`ask_question`** step and continue only when the returned value equals **`"approved"`**. This is a workflow-variable approval pattern, distinct from the SDK's typed `approve=True` tool-approval contract.
+For a workflow that must pause before an external side effect, use an **`ask_question`** step and continue only when the returned value equals **`"approved"`**. This is a workflow-variable approval pattern, distinct from the SDK's typed `approve=True` tool-approval contract. In the portal designer this step is the **Ask a question** node.
+
+**Retirement:** workflows in the Foundry portal retire on 1 December 2026. Build new workflows with the Microsoft Agent Framework.
 
 | Pattern               | Description                                                      |
 | --------------------- | ---------------------------------------------------------------- |
@@ -692,7 +1043,13 @@ For a workflow that must pause before an external side effect, use an **`ask_que
 | **Human-in-the-loop** | Pauses to request user input or approval before resuming         |
 | **Group chat**        | Dynamic multi-agent orchestration; control shifts between agents |
 
-**Workflow Node Types:**
+---
+
+<!-- _class: fit-32 -->
+
+## Workflow Node Types
+
+A workflow is a set of connected nodes. Each node does one kind of work:
 
 | Node                    | Sub-types / Purpose                                     |
 | ----------------------- | ------------------------------------------------------- |
@@ -717,15 +1074,9 @@ For a workflow that must pause before an external side effect, use an **`ask_que
 | Agents decide who contributes next                                                | Group chat                                       |
 | Independent steps that can run at the same time                                   | Concurrent                                       |
 
-**Why not the alternatives:** a multi-agent group chat is built for autonomous conversational collaboration and lets the agents choose the order; concurrent orchestration runs steps in parallel; threads and runs without a workflow — or separate agent runs coordinated in your own application code — mean you write and maintain the orchestration yourself.
+**Why not the alternatives:** a multi-agent group chat is built for autonomous conversational collaboration and lets the agents choose the order; concurrent orchestration runs steps in parallel; conversations and responses without a workflow — or separate agent runs coordinated in your own application code — mean you write and maintain the orchestration yourself.
 
----
-
-<!-- _class: fit-28 -->
-
-## Retrieval Practice — Lab 5
-
-Pause here and complete [Lab 5](../lab/lab%205/lab.md), then check its solution.
+**Retirement:** workflows in the Foundry portal retire on 1 December 2026. After that date, build the same shapes with the Microsoft Agent Framework.
 
 ---
 
@@ -760,23 +1111,21 @@ Concatenate(Local.FirstName, " ", Local.LastName)
 
 **Scope prefix is required** — bare `Var1` does not resolve.
 
-| Prefix                               | Source                                     |
-| ------------------------------------ | ------------------------------------------ |
-| `Local.<name>`                       | Workflow variables you defined             |
-| `System.<name>`                      | Built-in (e.g. `System.RunId`)             |
-| `Trigger.<name>`                     | Fields from the triggering message / input |
-| `Activity.<NodeName>.Output.<field>` | Output of an upstream node                 |
+| Prefix          | Source                                                             |
+| --------------- | ------------------------------------------------------------------ |
+| `Local.<name>`  | Workflow variables you defined                                     |
+| `System.<name>` | Built-in, supplied by the platform (e.g. `System.Conversation.Id`) |
 
 **Boolean operators:** `&&` `||` `Not(...)` `=` `<>` `>` `<` `>=` `<=`
 
 ```
 Not(IsBlank(Local.Email)) && Local.Age >= 18
-Activity.Classifier.Output.Confidence > 0.8 || Local.Override = true
+Local.Confidence > 0.8 || Local.Override = true
 ```
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-24 -->
 
 ## If/Else node — "must have a value"
 
@@ -807,7 +1156,7 @@ conversation = openai_client.conversations.create()
 
 stream = openai_client.responses.create(
     conversation=conversation.id,
-    extra_body={"agent": {"name": "triage-workflow", "type": "agent_reference"}},
+    extra_body={"agent_reference": {"name": "triage-workflow", "type": "agent_reference"}},
     input="Users can't reset their password from the mobile app.",
     stream=True,
 )
@@ -817,7 +1166,7 @@ for event in stream:
         print(event.response.output_text)
 ```
 
-**Check action status:** `event.item.type == ItemType.WORKFLOW_ACTION` → `event.item.status`
+**Check action status:** in `response.output`, each item with `type == "workflow_action"` carries a `status`.
 
 ---
 
@@ -831,16 +1180,16 @@ for event in stream:
 
 ## Framework Overview
 
-**Open-source SDK; provider-agnostic** (Azure OpenAI, OpenAI, Anthropic, Copilot Studio, Foundry)
+**Open-source SDK; provider-agnostic** (Foundry, Azure OpenAI, OpenAI, Anthropic, Amazon Bedrock, Ollama)
 
 **vs. Foundry Agent Service:**
 
-|               | Microsoft Agent Framework  | Foundry Agent Service |
-| ------------- | -------------------------- | --------------------- |
-| **Compute**   | Your infrastructure        | Fully managed         |
-| **Storage**   | Your storage               | Platform-managed      |
-| **Providers** | Any (OpenAI, Anthropic, …) | Foundry models        |
-| **Control**   | Full code control          | Configuration-based   |
+|                          | Microsoft Agent Framework                                                   | Foundry Agent Service |
+| ------------------------ | --------------------------------------------------------------------------- | --------------------- |
+| **Compute**              | Your infrastructure                                                         | Fully managed         |
+| **Conversation history** | In the session object, or service-side with a Foundry or Responses provider | Service-side          |
+| **Providers**            | Any (OpenAI, Anthropic, …)                                                  | Foundry models        |
+| **Control**              | Full code control                                                           | Configuration-based   |
 
 ---
 
@@ -848,22 +1197,23 @@ for event in stream:
 
 ## Core Components
 
-| Component                        | Description                                                            |
-| -------------------------------- | ---------------------------------------------------------------------- |
-| **`Agent`**                      | Main class: client + instructions + tools                              |
-| **`AzureOpenAIResponsesClient`** | Connection + auth to Foundry project                                   |
-| **`AgentSession`**               | Persistent conversation history (roles: USER, ASSISTANT, SYSTEM, TOOL) |
-| **Built-in tools**               | Code Interpreter, File Search, Web Search                              |
-| **`@tool` decorator**            | Marks Python functions as agent tools                                  |
+| Component               | Description                                                            |
+| ----------------------- | ---------------------------------------------------------------------- |
+| **`Agent`**             | Main class: client + instructions + tools                              |
+| **`FoundryChatClient`** | Connection + auth to Foundry project (from `agent_framework.foundry`)  |
+| **`AgentSession`**      | Persistent conversation history (roles: USER, ASSISTANT, SYSTEM, TOOL) |
+| **Built-in tools**      | Code Interpreter, File Search, Web Search                              |
+| **`@tool` decorator**   | Marks Python functions as agent tools                                  |
 
 ---
 
-<!-- _class: fit-28 -->
+<!-- _class: fit-24 -->
 
 ## Custom Tools with @tool
 
 ```python
-from microsoft_agent_framework import Agent, tool
+from agent_framework import Agent, tool
+from agent_framework.foundry import FoundryChatClient
 from pydantic import Field
 from typing import Annotated
 
@@ -874,11 +1224,11 @@ def get_stock_price(
     return 428.50
 
 agent = Agent(
-    client=AzureOpenAIResponsesClient(...),
+    client=FoundryChatClient(...),
     instructions="You are a financial advisor.",
     tools=[get_stock_price]
 )
-session = AgentSession()
+session = agent.create_session()
 result = await agent.run("What is the price of MSFT?", session=session)
 ```
 
@@ -916,22 +1266,26 @@ Each pattern is really a picture of _who talks to whom, in what order_.
 
 ---
 
-<!-- _class: fit-24 -->
+<!-- _class: fit-20 -->
 
 ## Orchestration Patterns
 
 **_[EXAM]_**
 
-| Pattern        | Builder class                   | When to use                                                  | Avoid when                          |
-| -------------- | ------------------------------- | ------------------------------------------------------------ | ----------------------------------- |
-| **Sequential** | `SequentialBuilder`             | Step-by-step pipelines; progressive refinement               | Stages can run in parallel          |
-| **Concurrent** | `ConcurrentBuilder`             | Parallel, independent tasks; ensemble; voting                | Tasks depend on each other          |
-| **Group chat** | `GroupChatBuilder`              | Collaborative conversation; maker-checker; human-in-the-loop | Simple linear tasks; speed critical |
-| **Handoff**    | `WorkflowBuilder` + switch-case | Dynamic delegation; expertise unknown upfront                | Fixed agent order known             |
-| **Magentic**   | `MagenticBuilder`               | Complex open-ended; plan-first; dynamic task ledger          | Simple/deterministic tasks          |
+| Pattern        | Builder class       | When to use                                                  | Avoid when                          |
+| -------------- | ------------------- | ------------------------------------------------------------ | ----------------------------------- |
+| **Sequential** | `SequentialBuilder` | Step-by-step pipelines; progressive refinement               | Stages can run in parallel          |
+| **Concurrent** | `ConcurrentBuilder` | Parallel, independent tasks; ensemble; voting                | Tasks depend on each other          |
+| **Group chat** | `GroupChatBuilder`  | Collaborative conversation; maker-checker; human-in-the-loop | Simple linear tasks; speed critical |
+| **Handoff**    | `HandoffBuilder`    | Dynamic delegation; expertise unknown upfront                | Fixed agent order known             |
+| **Magentic**   | `MagenticBuilder`   | Complex open-ended; plan-first; dynamic task ledger          | Simple/deterministic tasks          |
 
-**All patterns:** `participants()` → `build()` → `run()` or `run_stream()`  
-**Results:** `get_outputs()` → iterate messages with `.author` and `.content`
+**All patterns:** `Builder(participants=[...])` → `build()` → `run(...)` or `run(..., stream=True)`  
+**Results:** `get_outputs()` → iterate messages with `.author_name` and `.text`
+
+**Sequential output:** only the last participant by default; name earlier ones in `intermediate_output_from` to receive their `"intermediate"` events.
+
+**Import:** all five builders come from `agent_framework.orchestrations`.
 
 ---
 
@@ -947,9 +1301,15 @@ Each pattern is really a picture of _who talks to whom, in what order_.
 | **Fan-Out**     | Send one message to multiple executors simultaneously  |
 | **Fan-In**      | Combine outputs from multiple executors into one       |
 
-**Built-in events:** `WorkflowStartedEvent`, `WorkflowOutputEvent`, `WorkflowErrorEvent`, `ExecutorInvokeEvent`, `ExecutorCompleteEvent`, `RequestInfoEvent`
+**Built-in events:** one `WorkflowEvent` class with a `type`: `"started"`, `"output"`, `"failed"`, `"executor_invoked"`, `"executor_completed"`, `"request_info"`
 
 Workflows support **checkpointing** (save/resume state)
+
+---
+
+## Retrieval Practice — Lab 8
+
+Pause here and complete [Lab 8](../lab/lab%208/lab.md), then check its [solution](../lab/lab%208/solution.md).
 
 ---
 
@@ -993,13 +1353,32 @@ They solve two different questions.
 
 **Key advantage over MCP:** Each A2A agent chooses its own LLM; integrated authentication; cross-vendor
 
+**In Foundry:** an agent's own endpoint can expose the A2A protocol (`…/agents/<agent>/endpoint/protocols/a2a`) and an agent card, so a Foundry agent can be the remote agent as well as the caller.
+
 **Agent Card** — discovery document at `/.well-known/agent-card.json`:
+
+- `name` and `description`: who the agent is
+- `supportedInterfaces`: where to reach it (URL, protocol binding, protocol version)
+- `capabilities`: for example streaming
+- `skills`: what it can do, with tags and example prompts
+
+---
+
+<!-- _class: fit-22 -->
+
+## A2A Agent Card — Example
 
 ```json
 {
   "name": "weather-agent",
   "description": "Provides weather forecasts",
-  "endpoint_url": "https://my-agent.example.com/",
+  "supportedInterfaces": [
+    {
+      "url": "https://my-agent.example.com/",
+      "protocolBinding": "JSONRPC",
+      "protocolVersion": "1.0"
+    }
+  ],
   "capabilities": { "streaming": true },
   "skills": [
     {
@@ -1041,64 +1420,68 @@ They solve two different questions.
 
 <!-- _class: lead -->
 
-# Advanced Generative AI and Agent Operations
+# Agent Evaluation and Operations
 
-Operate agents by separating runtime state, tools, evaluation, and monitoring.
+Find the part that failed, then measure, correct, and monitor it.
 
 ---
 
 <!-- _class: fit-28 -->
 
-## Agent Lifecycle and Runtime State
+## Problem: "The Agent Gave a Bad Answer"
 
-**_[EXAM]_**
+That sentence is not a bug report. It could mean any of these:
 
-**Agent:** instructions, model, and tools
+- The search returned the wrong document
+- The instructions never said to cite sources
+- The tool threw an error and the model guessed instead
+- The model is too small for the task
+- Everything worked — last week's version was simply different
 
-**Thread or conversation:** persistent context
+**Need:** vocabulary precise enough to say _which part_ failed.
 
-**Message:** user, assistant, or tool content
-
-**Run:** one execution against the conversation
-
-Use a durable conversation or persisted message store when history must survive sessions.
-
-**To keep a full case history across sessions, store the conversation ID and reuse it.** Saving only the final model response loses the tool calls and tool outputs; summarizing condenses history instead of restoring the complete execution record.
+This part of the lecture gives you that vocabulary.
 
 ---
 
 <!-- _class: fit-24 -->
 
-## Agent Memory and Scopes
+## Evaluation and Error Analysis
 
 **_[EXAM]_**
 
-**Memory is not RAG and not conversation history.**
+A wrong answer has a _first_ broken link. Walk the chain in order and stop at the first failure.
 
-| Feature          | Stores                                              |
-| ---------------- | --------------------------------------------------- |
-| **Conversation** | The full turn history of one ongoing case           |
-| **Knowledge**    | Source documents retrieved as evidence              |
-| **Memory**       | Facts and preferences reused in _new_ conversations |
-
-**Scopes decide who shares a memory:**
-
-| Scope           | Lifetime                                            |
-| --------------- | --------------------------------------------------- |
-| `session`       | Discarded when the session ends                     |
-| `"{{$userId}}"` | Per signed-in user, across sessions — no ID in code |
-| `global`        | Shared by **all** users — leaks between users       |
-
-```python
-memory_tool = MemoryTool(scope="{{$userId}}")
-
-agent = project_client.agents.create_version(
-    name="support-agent",
-    definition=PromptAgentDefinition(model="gpt-4.1", tools=[memory_tool]),
-)
+```text
+  question ━▶ RETRIEVAL ━▶ PROMPT ━▶ MODEL ━▶ TOOL ━▶ ORCHESTRATION ━▶ SAFETY ━▶ UX
+                  ┃          ┃         ┃       ┃          ┃             ┃       ┃
+              wrong docs  unclear   too weak  errored  wrong agent   over/under  unclear
+                                                                      blocked   citations
 ```
 
-The `{{$userId}}` placeholder is substituted at runtime, so each user is isolated without generating identifiers yourself.
+Use a labeled evaluation dataset, reproduce the failure, change one layer, and compare the before/after metrics.
+
+---
+
+<!-- _class: fit-28 -->
+
+## Error Analysis — One Question per Layer
+
+**_[EXAM]_**
+
+**Separate failures by layer:**
+
+| Failure         | Diagnostic question                                |
+| --------------- | -------------------------------------------------- |
+| Retrieval       | Did the index return the right source and chunk?   |
+| Prompt          | Were instructions, context, and examples clear?    |
+| Model           | Can the selected model perform the task?           |
+| Tool            | Was the schema valid and did the tool complete?    |
+| Orchestration   | Did the workflow choose the right next agent?      |
+| Safety          | Should the request or response have been blocked?  |
+| User experience | Did the user understand uncertainty and citations? |
+
+Ask the questions from top to bottom. The first "no" is the layer to repair.
 
 ---
 
@@ -1111,7 +1494,7 @@ The `{{$userId}}` placeholder is substituted at runtime, so each user is isolate
 - Use a groundedness gate or evaluator to stop unsupported answers
 - Use `Search Index Data Reader` for read-only Search access
 - Use reflection to regenerate incomplete answers
-- Treat `approve=True` as a typed approval decision, not a string
+- Treat `approve=True` as a typed approval decision, not a string (SDK tool approval; a workflow `ask_question` step checks for `"approved"`)
 - Monitor tool calls, latency, tokens, handoffs, quality, safety, and versions
 
 **Error analysis:** inspect retrieval, prompt, model, tool, orchestration, safety, and user-experience layers in order.
@@ -1142,169 +1525,13 @@ The evaluation config path, the model deployment name, and the tenant ID do not 
 
 ---
 
-## Key Takeaways
-
-1. **Agent types:** Declarative (prompt-based / workflow) + Hosted
-2. **Custom tools:** Function calling, Azure Functions, OpenAPI 3.0, Logic Apps
-3. **MCP:** `MCPTool` attaches remote MCP servers; `require_approval` controls autonomy
-4. **Foundry IQ:** Managed RAG platform; multiple data sources; citation pattern
-5. **Agent Framework:** Open-source, provider-agnostic; `@tool` decorator for function tools
-6. **Orchestration patterns:** Sequential, Concurrent, Group chat, Handoff, Magentic
-7. **A2A:** `/.well-known/agent-card.json` for discovery; Agent Skills describe capabilities
-8. **`tool_choice`:** `"required"` forces _a_ tool; a named type such as `{"type": "bing_grounding"}` forces _which_ tool
-9. **Project connections:** one shared credential for every agent; each agent still gets its own identity
-10. **Memory scopes:** `session` expires, `{{$userId}}` isolates per user, `global` leaks between users
-
----
-
-<!-- _class: fit-28 -->
-
-## Problem: "The Agent Gave a Bad Answer"
-
-That sentence is not a bug report. It could mean any of these:
-
-- The search returned the wrong document
-- The instructions never said to cite sources
-- The tool threw an error and the model guessed instead
-- The model is too small for the task
-- Everything worked — last week's version was simply different
-
-**Need:** vocabulary precise enough to say _which part_ failed.
-
-This presentation is that vocabulary.
-
----
-
-<!-- _class: fit-28 -->
-
-## Retrieval Practice — Lab 6
-
-Pause here and complete [Lab 6](../lab/lab%206/lab.md), then check its solution.
-
----
-
-<!-- _class: fit-28 -->
-
-## Classic Agent Service Lifecycle
-
-**_[EXAM]_**
-
-For the exam, distinguish the persistent conversation objects from one execution:
-
-```text
-Agent       = instructions + model + tools
-Thread      = persistent conversation state
-Message     = user, assistant, or tool content in a thread
-Run         = one execution of an agent against a thread
-```
-
-**Typical flow:**
-
-```text
-create agent
-  → create thread
-  → add user message
-  → create and process run
-  → inspect run status
-  → list messages
-```
-
-**Why it matters:** a thread stores context, while a run represents the model and tool execution that produces the next response.
-
-**Current API note:** newer Responses API and Agent Framework examples may use conversations or sessions instead of these names. Know the conceptual mapping.
-
----
-
-<!-- _class: fit-28 -->
-
-## Thread vs Run — the Whiteboard and the Meeting
-
-```text
-  THREAD  (the whiteboard — stays on the wall)
-    ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-    ┃ msg 1  user      "Compare Q1 and Q2 revenue"            ┃
-    ┃ msg 2  assistant "Q1 was 4.2M, Q2 was 5.1M"             ┃
-    ┃ msg 3  user      "Now chart it"                         ┃
-    ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-      ▲                                ▲
-      ┃                                ┃
-      RUN #1                           RUN #2
-   (a meeting: reads the whole board, may call tools,
-    writes the next message, then ends)
-```
-
-**The thread persists; a run is over as soon as it produces its message.** Cost, latency, tool calls, and failures all belong to a _run_. Context belongs to the _thread_.
-
----
-
-## Retrieval Practice — Lab 7
-
-Pause here and complete [Lab 7](../lab/lab%207/lab.md), then check its solution.
-
----
-
-## Tool Taxonomy
-
-**_[EXAM]_**
-
-| Tool                       | Primary capability                             | Typical control                             |
-| -------------------------- | ---------------------------------------------- | ------------------------------------------- |
-| **Function tool**          | Application-owned operation                    | Your schema, validation, and execution      |
-| **MCP tool**               | Discoverable remote tools                      | Server permissions and approval policy      |
-| **File search**            | Retrieval from uploaded files or vector stores | Vector store and citation controls          |
-| **Code interpreter**       | Sandboxed Python execution                     | Files, timeout, memory, and network limits  |
-| **Web/Bing grounding**     | Current external information                   | Search scope, citations, and source quality |
-| **Azure Function/OpenAPI** | Connect APIs and event-driven logic            | Authentication and API contract             |
-
-**Selection rule:** use the narrowest tool that solves the task, and require approval for actions with external side effects.
-
----
-
-## Azure AI Search RBAC
-
-**_[EXAM]_**
-
-For read-only agent queries against a shared Azure AI Search service, assign the agent identity the **Search Index Data Reader** role. Managed identities let each agent receive a separate, auditable data-plane permission.
-
-**Role boundaries:**
-
-- **Search Index Data Reader:** query documents in indexes
-- **Search Index Data Contributor:** read and push documents
-- **Search Service Contributor:** manage indexes, indexers, and data sources
-
-Use the narrowest data-plane role that satisfies the agent's task; do not grant service-management permissions to a retrieval-only agent.
-
----
-
-## Retrieval Practice — Lab 8
-
-Pause here and complete [Lab 8](../lab/lab%208/lab.md) before continuing.
-
----
-
-<!-- _class: fit-28 -->
-
-## Generation Controls
-
-**_[EXAM]_**
-
-| Parameter                          | Main effect                        | Exam consideration                                     |
-| ---------------------------------- | ---------------------------------- | ------------------------------------------------------ |
-| `temperature`                      | Randomness and variation           | Lower for repeatable structured output                 |
-| `top_p`                            | Probability-mass vocabulary cutoff | Usually tune instead of temperature, not both          |
-| `max_tokens` / `max_output_tokens` | Output budget                      | Affects completeness, cost, and rate-limit reservation |
-| `frequency_penalty`                | Reduces repeated tokens            | Useful when responses repeat phrases                   |
-| `presence_penalty`                 | Encourages new topics              | Useful when broader exploration is desired             |
-
-**Do not use a parameter to solve the wrong problem:** grounding fixes missing knowledge; a penalty does not fix hallucination, and temperature does not add facts.
-
----
-
 ## Retrieval Practice — Lab 9
 
-Pause here and complete [Lab 9](../lab/lab%209/lab.md), then check its solution.
+Pause here and complete [Lab 9](../lab/lab%209/lab.md), then check its [solution](../lab/lab%209/solution.md).
 
 ---
+
+<!-- _class: fit-22 -->
 
 ## Reflection and Self-Critique Loops
 
@@ -1333,32 +1560,9 @@ When required clauses are missing, a reflection pass can check the draft against
 
 ---
 
-## Evaluation and Error Analysis
+## Retrieval Practice — Lab 10
 
-**_[EXAM]_**
-
-A wrong answer has a _first_ broken link. Walk the chain in order and stop at the first failure.
-
-```text
-  question ━▶ RETRIEVAL ━▶ PROMPT ━▶ MODEL ━▶ TOOL ━▶ ORCHESTRATION ━▶ SAFETY ━▶ UX
-                  ┃          ┃         ┃       ┃          ┃             ┃       ┃
-              wrong docs  unclear   too weak  errored  wrong agent   over/under  unclear
-                                                                      blocked   citations
-```
-
-**Separate failures by layer:**
-
-| Failure         | Diagnostic question                                |
-| --------------- | -------------------------------------------------- |
-| Retrieval       | Did the index return the right source and chunk?   |
-| Prompt          | Were instructions, context, and examples clear?    |
-| Model           | Can the selected model perform the task?           |
-| Tool            | Was the schema valid and did the tool complete?    |
-| Orchestration   | Did the workflow choose the right next agent?      |
-| Safety          | Should the request or response have been blocked?  |
-| User experience | Did the user understand uncertainty and citations? |
-
-Use a labeled evaluation dataset, reproduce the failure, change one layer, and compare the before/after metrics.
+Pause here and complete [Lab 10](../lab/lab%2010/lab.md), then check its [solution](../lab/lab%2010/solution.md).
 
 ---
 
@@ -1380,41 +1584,30 @@ Use a labeled evaluation dataset, reproduce the failure, change one layer, and c
 
 **Alert on:** quality regression, rising latency, cost spikes, repeated tool errors, unsafe outputs, and retrieval failures.
 
-**MSLearn status:** tracing, evaluation, and user feedback are covered; this complete operational view is primarily an exam synthesis.
+**On Microsoft Learn:** tracing and evaluation each have their own pages; this slide joins the signals into one list.
 
 ---
+
+<!-- _class: fit-20 -->
 
 ## Key Takeaways
 
-1. **Thread:** persistent context; **run:** one execution; **message:** content within the thread
-2. **Tools:** choose the narrowest safe tool and control external side effects
-3. **Parameters:** temperature, top P, token limits, frequency penalty, and presence penalty solve different problems
-4. **Reflection:** draft, inspect, revise, and measure the added cost
-5. **Error analysis:** isolate retrieval, prompt, model, tool, orchestration, safety, and UX failures
-6. **Operations:** monitor tokens, latency, tools, quality, safety, versions, and retries
-7. **MSLearn relationship:** the building blocks are present, but this exam-oriented lifecycle and operations synthesis is not a dedicated scraped lesson
-
----
-
-## Human Approval Contract
-
-**_[EXAM]_**
-
-When a tool call requires approval, the SDK submits a Boolean decision such as `approve=True` or `approve=False` tied to the tool call. The string `"approved"` is not the SDK approval value.
-
----
-
-<!-- _class: fit-28 -->
-
-## Retrieval Practice — Lab 3
-
-Pause here and complete [Lab 3](../lab/lab%203/lab.md) before continuing.
-
----
-
-## Retrieval Practice — Lab 10
-
-Pause here and complete [Lab 10](../lab/lab%2010/lab.md), then check its solution.
+1. **Agent types:** prompt agent, voice-based prompt agent, and hosted agent; portal workflows are being retired
+2. **Generation controls:** reasoning effort sets how much the model thinks; the output token limit sets the budget for reasoning and answer together
+3. **Conversation:** persistent history; **response:** one execution; **item:** a message, tool call, or tool output in the conversation (classic API: thread, run, message)
+4. **Memory scope:** a partition key; `{{$userId}}` isolates per user, one static value is shared by everyone who uses it; a TTL on the memory store sets the lifetime
+5. **Custom tools:** function calling, Azure Functions, OpenAPI 3.0 or 3.1, and MCP servers
+6. **Project connections:** one shared credential for every agent; each agent still gets its own identity
+7. **MCP:** `MCPTool` attaches remote MCP servers; `require_approval` controls autonomy
+8. **Tools:** choose the narrowest safe tool and control external side effects
+9. **`tool_choice`:** `"required"` forces _a_ tool; a named tool such as `{"type": "function", "name": "recent_snowfall"}` forces _which_ tool
+10. **Foundry IQ:** shared knowledge bases; indexed and remote knowledge sources; citation pattern
+11. **Agent Framework:** Open-source, provider-agnostic; `@tool` decorator for function tools
+12. **Orchestration patterns:** Sequential, Concurrent, Group chat, Handoff, Magentic
+13. **A2A:** `/.well-known/agent-card.json` for discovery; skills describe what the agent can do
+14. **Error analysis:** isolate retrieval, prompt, model, tool, orchestration, safety, and UX failures
+15. **Reflection:** draft, inspect, revise, and measure the added cost
+16. **Operations:** monitor tokens, latency, tool calls, quality, safety, versions, and retries
 
 ---
 
@@ -1422,18 +1615,19 @@ Pause here and complete [Lab 10](../lab/lab%2010/lab.md), then check its solutio
 
 # Appendix
 
-Relationship to the Microsoft Learn path
+How to use this lecture next to Microsoft Learn
 
 ---
 
 <!-- _class: fit-24 -->
 
-## Coverage Map
+## How to Use This Lecture Next to Microsoft Learn
 
-| Exam objective                                                         | MSLearn status                                                                                              |
-| ---------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| Agent `thread` / `run` / `message` lifecycle                           | **Indirect** — Agent Framework sessions and workflow runs are covered; the classic lifecycle is not central |
-| Function, MCP, file search, code interpreter, and Bing grounding tools | **Partial** — most tools are covered; the exam grouping is not presented as one comparison                  |
-| Prompt parameters and generation controls                              | **Partial** — temperature, top P, and token limits are covered; frequency and presence penalties are not    |
-| Reflection, self-critique, and error analysis                          | **Indirect** — evaluation is covered; these patterns are not developed deeply                               |
-| Agent production monitoring                                            | **Indirect** — tracing and feedback appear, but the exam checklist is broader                               |
+Microsoft Learn explains each product feature on its own page. These slides put related facts side by side, in the way the exam asks about them.
+
+| Topic in this lecture                                                  | What the slides put together                                                   |
+| ---------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| Agent, conversation, and response lifecycle                            | One picture of what persists (the conversation) and what executes (a response) |
+| Function, MCP, file search, code interpreter, and Bing grounding tools | One comparison table and a rule to choose between them                         |
+| Reflection, self-critique, and error analysis                          | The reflection loop and a layer-by-layer search for the first failure          |
+| Agent production monitoring                                            | One list of what to monitor and when to alert                                  |

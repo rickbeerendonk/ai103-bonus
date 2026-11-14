@@ -1,5 +1,5 @@
 # Lab 10 - Solution
 
-13. Use the secondary key, regenerate the primary key, then use the new primary key.
-14. Object projection for JSON; table projection for tabular text.
-15. Add allowed groups, retrieve user memberships, and filter searches by those groups.
+28. `input_audio_buffer.speech_started`.
+29. Streaming audio, server-side VAD, and low `silence_duration_ms`.
+30. `Not(IsBlank(Local.Var1))`.

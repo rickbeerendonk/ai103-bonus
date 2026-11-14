@@ -1,5 +1,5 @@
 # Lab 8 - Solution
 
-7. `prebuilt-layout`.
-8. `AnalyzeOutputOption.FIGURES`.
-9. Markdown preserves headings, tables, and structure for reasoning.
+22. Content Understanding, with an analyzer.
+23. `AnalyzeOutputOption.FIGURES`.
+24. Markdown preserves headings, tables, and structure for reasoning.

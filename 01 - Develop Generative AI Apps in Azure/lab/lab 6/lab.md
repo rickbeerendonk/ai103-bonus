@@ -1,5 +1,7 @@
-# Lab 6 - Observability
+# Lab 6 - Governance
 
-1. Which platform collects Azure resource metrics and logs?
-2. Where are resource logs stored for KQL analysis?
-3. What must you configure before logs flow to Log Analytics?
+Answer from memory after the matching lecture section:
+
+16. Name three responsible AI principles.
+17. What is a phased delivery plan?
+18. Why should an AI system have a rollback plan?

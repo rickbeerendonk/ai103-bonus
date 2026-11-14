@@ -1,5 +1,5 @@
 # Lab 4 - Solution
 
-10. Models lack private and current organizational data without retrieval.
-11. Indexed sources are prepared for fast search; real-time sources are queried when current data is needed.
-12. When to search, which source to use, how to cite, and what to do when no answer is found.
+10. Use it for a business operation not exposed by another tool.
+11. It describes an HTTP API, operations, parameters, and schemas.
+12. Discoverable tool definitions and invocation through MCP.

@@ -1,5 +1,5 @@
-# Lab 3 - Document Intelligence
+# Lab 3 - Video Generation
 
-7. Which model preserves document layout and tables?
-8. Which output format supports structured downstream reasoning?
-9. Why create one page chunk at a time?
+7. Which three steps turn a prompt into a video file?
+8. How do you make one targeted change to a generated video?
+9. How long can a completed video be downloaded?

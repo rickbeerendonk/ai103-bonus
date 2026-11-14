@@ -1,5 +1,5 @@
 # Lab 9 - Solution
 
-10. `input_audio_buffer.speech_started`.
-11. Streaming audio, server-side VAD, and low `silence_duration_ms`.
-12. `Not(IsBlank(Local.Var1))`.
+25. Use the secondary key, regenerate the primary key, then use the new primary key.
+26. Object projection for JSON; table projection for tabular text.
+27. Add allowed groups, retrieve user memberships, and filter searches by those groups.

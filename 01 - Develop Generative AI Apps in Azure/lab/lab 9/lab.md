@@ -1,5 +1,7 @@
-# Lab 9 - Governance
+# Lab 9 - Observability
 
-10. Name three responsible AI principles.
-11. What is a phased delivery plan?
-12. Why should an AI system have a rollback plan?
+Answer from memory after the matching lecture section:
+
+25. Which platform collects Azure resource metrics and logs?
+26. Where are resource logs stored for KQL analysis?
+27. What must you configure before logs flow to Log Analytics?

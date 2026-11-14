@@ -1,5 +1,5 @@
-# Lab 4 - Translation and Pronunciation
+# Lab 4 - Speech
 
-10. Which service translates text between languages?
-11. Which SSML feature corrects a technical pronunciation?
-12. What does prosody control?
+10. Which API converts text to speech?
+11. Which API converts speech to text?
+12. When should you use continuous recognition?

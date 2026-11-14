@@ -1,5 +1,5 @@
-# Lab 6 - Content Safety
+# Lab 6 - Content Understanding
 
-1. Name the four severity-based content categories.
-2. What is the difference between direct and indirect prompt attacks?
-3. What does protected-material detection address?
+16. What is an analyzer?
+17. What is the difference between `extract` and `classify`?
+18. Which content can a multimodal analyzer process?

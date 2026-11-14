@@ -1,0 +1,575 @@
+/*
+ * @theme oblicum-marp-theme
+ * @auto-scaling fittingHeader codeBlock
+ */
+@import "default";
+
+/* Optional font imports */
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Comfortaa:wght@300;500;700&display=swap");
+
+/* Self-hosted JetBrains Mono — full glyph coverage (incl. box-drawing) */
+@font-face {
+  font-family: "JetBrains Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("fonts/JetBrainsMono-Regular.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "JetBrains Mono";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("fonts/JetBrainsMono-Bold.woff2") format("woff2");
+}
+
+section {
+  /* General slide settings */
+  --fit-font-size: 36px;
+  --demo-font-size: 24px;
+  font-family: "Montserrat", sans-serif;
+  color: #222;
+  box-sizing: border-box;
+  background-color: white;
+  padding: 0px 40px 0 70px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* Start content at top instead of center */
+  font-size: 36px; /* Base font size */
+  line-height: 1.2;
+  overflow: hidden; /* Prevent content overflow */
+  isolation: isolate; /* Create stacking context so footer z-index: -1 stays above section background */
+}
+
+section > :first-child {
+  margin-top: var(
+    --base-size-24
+  ) !important; /* Remove top margin from first element */
+  margin-bottom: var(
+    --base-size-16
+  ) !important; /* Remove bottom margin from first element */
+}
+
+section > :last-child {
+  margin-bottom: var(
+    --base-size-8
+  ); /* Remove bottom margin from last element */
+}
+
+/* Auto-fit content: uses smaller base size and tighter spacing */
+section.auto-fit {
+  font-size: 24px; /* Fixed px works correctly inside inline SVG — the SVG element handles viewport scaling */
+}
+
+section.auto-fit code,
+section.auto-fit li,
+section.auto-fit p,
+section.auto-fit table {
+  font-size: inherit;
+  line-height: 1.2;
+  margin: 0.2em 0;
+}
+
+section.fit-32 code,
+section.fit-32 li,
+section.fit-32 p,
+section.fit-32 pre,
+section.fit-32 table {
+  font-size: 32px;
+  line-height: 1.1;
+}
+
+section.fit-32 {
+  --fit-font-size: 32px;
+  --demo-font-size: 24px;
+}
+
+section.fit-28 code,
+section.fit-28 li,
+section.fit-28 p,
+section.fit-28 pre,
+section.fit-28 table {
+  font-size: 28px;
+  line-height: 1.1;
+}
+
+section.fit-28 {
+  --fit-font-size: 28px;
+  --demo-font-size: 21px;
+}
+
+section.fit-24 code,
+section.fit-24 li,
+section.fit-24 p,
+section.fit-24 pre,
+section.fit-24 table {
+  font-size: 24px;
+  line-height: 1.1;
+}
+
+section.fit-24 {
+  --fit-font-size: 24px;
+  --demo-font-size: 18px;
+}
+
+section.fit-22 code,
+section.fit-22 li,
+section.fit-22 p,
+section.fit-22 pre,
+section.fit-22 table {
+  font-size: 22px;
+  line-height: 1.1;
+}
+
+section.fit-22 {
+  --fit-font-size: 22px;
+  --demo-font-size: 16.5px;
+}
+
+section.fit-20 code,
+section.fit-20 li,
+section.fit-20 p,
+section.fit-20 pre,
+section.fit-20 table {
+  font-size: 20px;
+  line-height: 1.1;
+}
+
+section.fit-20 {
+  --fit-font-size: 20px;
+  --demo-font-size: 15px;
+}
+
+section.fit-18 code,
+section.fit-18 li,
+section.fit-18 p,
+section.fit-18 pre,
+section.fit-18 table {
+  font-size: 18px;
+  line-height: 1.1;
+}
+
+section.fit-18 {
+  --fit-font-size: 18px;
+  --demo-font-size: 13.5px;
+}
+
+section.fit-16 code,
+section.fit-16 li,
+section.fit-16 p,
+section.fit-16 pre,
+section.fit-16 table {
+  font-size: 16px;
+  line-height: 1.1;
+}
+
+section.fit-16 {
+  --fit-font-size: 16px;
+  --demo-font-size: 12px;
+}
+
+section[class*="fit-"] > :first-child ~ :is(h1, h2, h3, h4, h5, h6),
+section[class*="fit-"] > :first-child ~ * :is(h1, h2, h3, h4, h5, h6) {
+  font-size: var(--fit-font-size);
+  line-height: 1.1;
+}
+
+section.fit-28 code,
+section.fit-24 code,
+section.fit-22 code,
+section.fit-20 code,
+section.fit-18 code,
+section.fit-16 code {
+  line-height: 1;
+}
+
+/* Keep lead slides centered */
+section.lead {
+  justify-content: center;
+}
+
+/* Audience prompts and short reflection exercises */
+section.ask {
+  background-color: #e1f5fe;
+}
+
+section.ask::after {
+  content: "?";
+  position: absolute;
+  top: 0;
+  right: 70px;
+  font-family: "Comfortaa", sans-serif;
+  font-size: 260px;
+  font-weight: 700;
+  color: rgba(0, 120, 215, 0.12);
+  line-height: 1;
+  pointer-events: none;
+}
+
+section.ask h1,
+section.ask h2 {
+  color: #0078d7;
+}
+
+section.ask p,
+section.ask li {
+  background-color: transparent;
+}
+
+section.story {
+  background-color: #fdf6ec;
+}
+
+section.story p,
+section.story li {
+  background-color: transparent;
+}
+
+.timer {
+  display: inline-block;
+  align-self: center;
+  padding: 6px 22px;
+  border-radius: 28px;
+  background: #0078d7;
+  color: white;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.demo {
+  display: inline-block;
+  padding: 0.25em 0.9em;
+  border-radius: 1.2em;
+  background: #b4009e;
+  color: white;
+  font-size: var(--demo-font-size);
+  font-weight: 700;
+}
+
+.sources {
+  position: absolute;
+  left: 70px;
+  right: 40px;
+  bottom: 44px;
+  font-size: 10.5px;
+  line-height: 1.18;
+  color: #666;
+}
+
+.sources a {
+  font-size: inherit;
+}
+
+.sources p {
+  margin: 0;
+  font-size: inherit;
+  line-height: inherit;
+  color: inherit;
+  background-color: transparent;
+}
+
+.center {
+  margin: 26px 0;
+  text-align: center;
+}
+
+.big {
+  font-size: 42px;
+  font-weight: 700;
+}
+
+.medium {
+  font-size: 32px;
+  font-weight: 700;
+}
+
+/* --- Column layouts --- */
+.columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 36px;
+  width: 100%;
+}
+
+.columns_2left {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 36px;
+  width: 100%;
+}
+
+.columns_2right {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 36px;
+  width: 100%;
+}
+
+.columns-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 30px;
+  width: 100%;
+}
+
+/* --- Typography --- */
+h1,
+h2,
+h3 {
+  font-family: "Comfortaa", sans-serif;
+  font-weight: 700;
+  color: #222;
+}
+
+h1 {
+  font-size: 72px;
+  line-height: 1.2;
+}
+
+h4 {
+  font-family: "Montserrat", sans-serif;
+  font-weight: 400;
+  color: #666;
+}
+
+h4 a {
+  color: #666;
+  text-decoration: none;
+  pointer-events: none;
+}
+
+a {
+  color: #0078d7;
+  text-decoration: underline;
+}
+
+strong,
+b {
+  font-weight: 700;
+}
+
+p,
+li {
+  font-family: "Montserrat", sans-serif;
+  font-weight: 400;
+  font-size: 36px;
+  line-height: 1.1;
+  color: #222;
+  background-color: white; /* Opaque background so content covers footer logos */
+}
+
+li li {
+  color: #b4009e;
+}
+
+li li li {
+  color: #0078d7;
+}
+
+/* --- Tables --- */
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th {
+  background-color: #0078d7;
+  color: white;
+  font-weight: 700;
+  padding: 0.5em;
+  text-align: left;
+}
+
+td {
+  padding: 0.5em;
+  border-bottom: 1px solid #ddd;
+}
+
+/* --- Code blocks --- */
+pre {
+  font-family: "JetBrains Mono", monospace;
+  font-variant-ligatures: none;
+  font-size: 36px;
+  overflow: visible;
+  background-color: #e1f5fe;
+  color: #001a40;
+  border: 1px solid #b3e5f7;
+  border-radius: 6px;
+  padding: 0.1em 0.2em;
+}
+
+pre.diagram {
+  line-height: 1;
+}
+
+/* Inline code */
+code {
+  font-family: "JetBrains Mono", monospace;
+  font-variant-ligatures: none;
+  background-color: rgba(195, 235, 253, 0.5);
+  color: #001a40;
+  border-radius: 6px;
+  padding: 0;
+}
+
+/* Syntax highlighting colors */
+code .hljs-comment,
+code .hljs-quote {
+  color: #b4009e !important;
+  font-style: italic;
+}
+
+code .hljs-keyword,
+code .hljs-selector-tag,
+code .hljs-literal,
+code .hljs-type,
+code .hljs-built_in,
+code .hljs-builtin-name,
+code .hljs-selector-class,
+code .hljs-selector-pseudo,
+code .hljs-template-tag,
+code .hljs-deletion {
+  color: #001a40;
+  font-weight: bold;
+}
+
+code .hljs-string,
+code .hljs-doctag,
+code .hljs-regexp,
+code .hljs-addition {
+  color: #001a40;
+}
+
+code .hljs-number {
+  color: #001a40;
+}
+
+code .hljs-function,
+code .hljs-title,
+code .hljs-title.function_,
+code .hljs-title.class_,
+code .hljs-title.class,
+code .hljs-class .hljs-title {
+  color: #001a40;
+  font-weight: bold;
+}
+
+code .hljs-params,
+code .hljs-property,
+code .hljs-attribute {
+  color: #001a40;
+}
+
+code .hljs-tag,
+code .hljs-name {
+  color: #001a40;
+}
+
+code .hljs-variable,
+code .hljs-template-variable {
+  color: #001a40;
+}
+
+code .hljs-attr,
+code .hljs-meta,
+code .hljs-meta-string,
+code .hljs-meta .hljs-string {
+  color: #001a40;
+}
+
+code .hljs-section,
+code .hljs-selector-id {
+  color: #001a40;
+  font-weight: bold;
+}
+
+code .hljs-emphasis {
+  font-style: italic;
+}
+
+code .hljs-strong {
+  font-weight: bold;
+}
+
+code .hljs-link,
+code .hljs-symbol,
+code .hljs-bullet {
+  text-decoration: underline;
+}
+
+code .hljs-punctuation,
+code .hljs-operator {
+  color: #001a40;
+}
+
+/* --- Footer: copyright and logo --- */
+footer {
+  position: absolute;
+  bottom: 3px;
+  right: 33px;
+  text-align: right;
+  z-index: -1; /* Render behind slide content — section's isolation: isolate keeps it above the white background */
+  filter: drop-shadow(0px 0px 3px rgba(255, 255, 255, 0.9))
+    drop-shadow(0px 0px 8px rgba(255, 255, 255, 0.7))
+    drop-shadow(0px 0px 15px rgba(255, 255, 255, 0.5));
+}
+
+footer img {
+  width: 120px;
+  height: auto;
+  padding: 1%;
+  vertical-align: middle;
+}
+
+/* Double size footer image for title slide */
+section.lead footer img {
+  width: 236px;
+}
+
+section::before {
+  content: "© Rick Beerendonk";
+  position: absolute;
+  bottom: 10px;
+  right: -90px;
+  transform: rotate(-90deg);
+  transform-origin: bottom left;
+  font-family: "Comfortaa", sans-serif;
+  font-size: 10px;
+  color: #888;
+}
+
+/* --- Code line highlighting (without line numbers) --- */
+pre ol {
+  all: unset;
+  display: block;
+  margin: 0;
+  padding: 0;
+  font-family: "JetBrains Mono", monospace;
+  font-variant-ligatures: none;
+  font-size: 24px;
+  color: #001a40;
+}
+
+pre ol li {
+  display: block;
+  margin: 0;
+  padding: 0;
+  font-family: inherit;
+  min-height: 1em; /* Preserve empty lines */
+  background-color: transparent; /* Override the white from p, li rule */
+}
+
+pre ol li span {
+  font-family: inherit;
+  font-variant-ligatures: inherit;
+}
+
+pre ol li span[data-marp-line-number] {
+  display: none;
+}
+
+pre .highlighted-line {
+  background-color: #fff9c4;
+  border-radius: 3px;
+}

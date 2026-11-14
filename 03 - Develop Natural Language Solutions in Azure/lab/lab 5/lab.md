@@ -1,5 +1,5 @@
-# Lab 5 - Responsible AI
+# Lab 5 - Pronunciation and Custom Speech
 
-13. Which principle is supported by telling users how data is processed?
-14. What is the difference between blocking and annotating content?
-15. Why should safety checks cover both input and output?
+13. Which SSML feature corrects a technical pronunciation?
+14. What does prosody control?
+15. What happens to requests on a custom endpoint when its custom speech model expires?
