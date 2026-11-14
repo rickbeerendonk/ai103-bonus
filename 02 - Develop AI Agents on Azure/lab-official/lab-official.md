@@ -12,10 +12,9 @@ Lab 08: https://microsoftlearning.github.io/mslearn-ai-agents/Instructions/Exerc
 Lab 09: https://microsoftlearning.github.io/mslearn-ai-agents/Instructions/Exercises/04-integrate-agent-with-foundry-iq.html
 45 minutes
 
-**DEMO (skip)**
+**DEMO**
 https://microsoftlearning.github.io/mslearn-ai-agents/Instructions/Exercises/05a-m365-teams-integration.html
-40 minutes
-https://youtu.be/eWYOZkFoNn4?si=2KqGQfRd8w1tWpdN&t=361
+40 minutes (https://youtu.be/eWYOZkFoNn4?si=2KqGQfRd8w1tWpdN&t=361)
 
 **DEMO**
 https://microsoftlearning.github.io/mslearn-ai-agents/Instructions/Exercises/06-build-workflow-ms-foundry.html
